@@ -1,20 +1,38 @@
-import { Body, Controller, Get, Post, Req, Res, Session } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  Session,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
+import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from './dto/createUser.dto';
+import { EditUserDto } from './dto/editUser.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Req() req: Request, @Res() res: Response, @Session() session) {
+  async login(
+    @Body() body: LoginDto,
+    @Res() res: Response,
+    @Session() session: Record<string, any>,
+  ) {
     // session.userData = '123';
     // console.log('');
     // console.log('req.body', req.session);
-    const { username, password } = req.body;
+
     const resultLogin = await this.authService.login({
-      username: username,
-      password: password,
+      username: body.username,
+      password: body.password,
     });
     if (resultLogin) {
       session.userData = {
@@ -23,9 +41,6 @@ export class AuthController {
         role: resultLogin.role,
       };
       console.log('session.id login', session.id);
-      // res.cookie('mycookie', session.id, {
-      //   httpOnly: true,
-      // });
       res
         .status(201)
         .json({ message: 'Login successfully', data: resultLogin });
@@ -34,6 +49,11 @@ export class AuthController {
         .status(401)
         .json({ message: 'Username not found or password is incorrect' });
     }
+  }
+
+  @Post('register')
+  async createUser(@Body() body: CreateUserDto) {
+    return await this.authService.createUser(body);
   }
 
   @Get('session')
@@ -82,7 +102,22 @@ export class AuthController {
   }
 
   @Get('users')
-  getAllUser() {
-    return this.authService.getAllUser();
+  getAllUser(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('role') role: 'user' | 'admin',
+  ) {
+    // console.log(`${page} , ${limit}`);
+    return this.authService.getAllUser(page, limit, role);
+  }
+
+  @Post('edit/:id')
+  editUser(@Param('id') id: number, @Body() body: EditUserDto) {
+    return this.authService.editUser(id, body);
+  }
+
+  @Delete('delete/:id')
+  deleteUser(@Param('id') id: number) {
+    return this.authService.deleteUser(id);
   }
 }

@@ -18,6 +18,19 @@ import { AuthMiddleware } from './auth.middleware';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('auth/users');
+    consumer.apply(AuthMiddleware).forRoutes(
+      {
+        path: 'auth/users',
+        method: RequestMethod.GET,
+      },
+      {
+        path: 'auth/edit/:id',
+        method: RequestMethod.POST,
+      },
+      {
+        path: 'auth/delete/:id',
+        method: RequestMethod.DELETE,
+      },
+    );
   }
 }

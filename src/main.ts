@@ -3,12 +3,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 
-// import * as cookieParser from 'cookie-parser';
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  // ap.use(cpookieParser('your-secret-key'));
   app.use(
     session({
       name: 'SESSION_ONCE',
@@ -18,12 +15,13 @@ async function bootstrap() {
       cookie: {
         secure: false,
         httpOnly: true, // Cookie chỉ được gửi qua HTTP
-        maxAge: 20000,
+        maxAge: 2000000,
       },
     }),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.useGlobalPipes(new ValidationPipe());
+  await app.listen(process.env.PORT ?? 7423);
 }
 
 bootstrap();

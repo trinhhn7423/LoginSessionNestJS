@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 // import { Exclude } from 'class-transformer';
 
@@ -10,6 +16,7 @@ export class AuthEntity {
   @Column({ length: 20, unique: true })
   username: string;
 
+  @Exclude()
   @Column({ nullable: false })
   password: string;
 
@@ -36,8 +43,6 @@ export class AuthEntity {
   })
   updated_at: Date;
 
-  @Column({
-    nullable: true,
-  })
+  @DeleteDateColumn()
   deleted_at: Date;
 }
