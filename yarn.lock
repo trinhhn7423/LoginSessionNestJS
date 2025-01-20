@@ -765,6 +765,90 @@
   dependencies:
     uuid "9.0.1"
 
+"@ngrok/ngrok-android-arm-eabi@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-android-arm-eabi/-/ngrok-android-arm-eabi-1.4.1.tgz#5a5ab818e1fe8ccfe25b6e0f6c7d41b810c89da5"
+  integrity sha512-KQe59T8PhFg5XvWypcOCIgUakk/A9ipD1UvSgGuLI7pYIiVcx6oyW12RxCJr6cfdO0K5GrbUG6dlEXSmDD4jBg==
+
+"@ngrok/ngrok-android-arm64@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-android-arm64/-/ngrok-android-arm64-1.4.1.tgz#16fb6ef2b9a63bc8ef92f2d18eee5dc89a082be9"
+  integrity sha512-WPYJenabIArkGmeVhBcIVtgXmLK297pfJCYHP1Tnw220ANEXFdo7EW4dZoP0AA0gxciFHGYnQUMOn1Meo0IQFQ==
+
+"@ngrok/ngrok-darwin-arm64@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-darwin-arm64/-/ngrok-darwin-arm64-1.4.1.tgz#464309b710e3465c2f5e6dafcad958c2529297e9"
+  integrity sha512-hJW+ZDJ0uV7PieZAdZHdzR/WBRctjOkLzFqHTxSuNbmBr9uIg6PGf1dB2lySszK1wyKZL7wvh4GedQ4vSU5lkw==
+
+"@ngrok/ngrok-darwin-universal@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-darwin-universal/-/ngrok-darwin-universal-1.4.1.tgz#81efe1d0a5fdbdbbbcc005ba94b9f366f38d8e36"
+  integrity sha512-rUZKl/vr2cALpT1Ng91h8Jf5OfDtF+zNEC65AFWthPkHJpPQCLvuEC9hyF8XI52Bv45ORRb1YKR3hdhjZ4WGHQ==
+
+"@ngrok/ngrok-darwin-x64@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-darwin-x64/-/ngrok-darwin-x64-1.4.1.tgz#d3eebbbcc4c690d8349f63570c1ae2d99db777a5"
+  integrity sha512-UKIkRpsGBywAqvwz8L6R8ITz+xxPoZ58LSFhZoMAWm2alGOdA2js1eHZwwVTSz96/tmmSRE/H+r69TvtuL0lXA==
+
+"@ngrok/ngrok-freebsd-x64@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-freebsd-x64/-/ngrok-freebsd-x64-1.4.1.tgz#33413ee3161304592b58795aa045048040c7917c"
+  integrity sha512-v1xXqmu3f4W1PQt+NKlqXgLcpULYCSwStKGRSdgXljg1bRdOnW3ZdjbGzrIdKwQ7OcwZP34KbP13G+hqcTxo5Q==
+
+"@ngrok/ngrok-linux-arm-gnueabihf@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-linux-arm-gnueabihf/-/ngrok-linux-arm-gnueabihf-1.4.1.tgz#dc40f3c6fbe1d74031276a521e9fd8973f7fc775"
+  integrity sha512-yEeiVAGQNUErkSpOI1EZI+X3AkHCGd8yzqfjHamnhEONkwxLcWuTiUfcwFeMVtE9jyLfvQxctldPXXAjvaI/QA==
+
+"@ngrok/ngrok-linux-arm64-gnu@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-linux-arm64-gnu/-/ngrok-linux-arm64-gnu-1.4.1.tgz#8763e281febce49d4622a86d760b70bd0be6681b"
+  integrity sha512-Fb2uju769eO/yOrWdbMvCXNczbXHnqNmN5TCYvqQbPdscFgrsNaJcVr2SmWOfBq+OcLWYbx6mXE1ki5yOZKU9w==
+
+"@ngrok/ngrok-linux-arm64-musl@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-linux-arm64-musl/-/ngrok-linux-arm64-musl-1.4.1.tgz#68ca49fcb07a468dde15337eefd5b007f3fe086f"
+  integrity sha512-nMTTZkUnwCzeIVDkoUdNqBKe6ArYXRWGjC4iXinfPOdENkb/tZ/eAjVdg+8bQ5PJgl/n/TbdZKNj//Jz2x8fdw==
+
+"@ngrok/ngrok-linux-x64-gnu@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-linux-x64-gnu/-/ngrok-linux-x64-gnu-1.4.1.tgz#f2bed3d9b066e63c776c0e62c141fda283f6dc1e"
+  integrity sha512-IfDaYd9ZGk7F0szHql5Tr3rlLBlhuKbbNXDVkujGy/njA4/YnckfsZilGEtgnR7aYgHo3NqppfEw+AOmlDytCw==
+
+"@ngrok/ngrok-linux-x64-musl@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-linux-x64-musl/-/ngrok-linux-x64-musl-1.4.1.tgz#59729bfa9ea58a684bf15c38958029e9f967676b"
+  integrity sha512-Ze6wb2umg6hfJhxOrFQhiyIZOf9YjSRkefnaQdAaONrIKxiFsu5SIKQbp7MQRnm8wabB9i0OI0Q/TVBsxo/HLw==
+
+"@ngrok/ngrok-win32-ia32-msvc@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-win32-ia32-msvc/-/ngrok-win32-ia32-msvc-1.4.1.tgz#0fab1cf1a36ad6ed6c552eadc9f673348448e4e3"
+  integrity sha512-FV3dwGpbh1h2fJ7h+Od8vFRrR9RxqBUAI+ELxQxropDxwYp6rWGKFnfE+JUcT79fEH3OpA0ElULrIDrLgK7bgg==
+
+"@ngrok/ngrok-win32-x64-msvc@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok-win32-x64-msvc/-/ngrok-win32-x64-msvc-1.4.1.tgz#add9186b672712f33e14123291a482343d162013"
+  integrity sha512-Zr1Dyel4M3cA1kjT/N5ftTiCdoPnVv/VbyE6AKKemP9DDFkTlpdvMwSXikm/ypNtCNFEs/+q8CBZPhhaKktl8A==
+
+"@ngrok/ngrok@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@ngrok/ngrok/-/ngrok-1.4.1.tgz#92e5026d4b0d27eb3321ae2fbfeb4f0cb536781a"
+  integrity sha512-KZ7/T4UOY3BqJBdweJPeebKW34YzIH+a2y4o7yqTIowoi6dw3sMj140o1Q8FvpPbH5J6lr2TWVCWdgSTYvHNgw==
+  optionalDependencies:
+    "@ngrok/ngrok-android-arm-eabi" "1.4.1"
+    "@ngrok/ngrok-android-arm64" "1.4.1"
+    "@ngrok/ngrok-darwin-arm64" "1.4.1"
+    "@ngrok/ngrok-darwin-universal" "1.4.1"
+    "@ngrok/ngrok-darwin-x64" "1.4.1"
+    "@ngrok/ngrok-freebsd-x64" "1.4.1"
+    "@ngrok/ngrok-linux-arm-gnueabihf" "1.4.1"
+    "@ngrok/ngrok-linux-arm64-gnu" "1.4.1"
+    "@ngrok/ngrok-linux-arm64-musl" "1.4.1"
+    "@ngrok/ngrok-linux-x64-gnu" "1.4.1"
+    "@ngrok/ngrok-linux-x64-musl" "1.4.1"
+    "@ngrok/ngrok-win32-ia32-msvc" "1.4.1"
+    "@ngrok/ngrok-win32-x64-msvc" "1.4.1"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"

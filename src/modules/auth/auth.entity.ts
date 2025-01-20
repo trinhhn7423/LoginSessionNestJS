@@ -1,19 +1,19 @@
 import {
   Column,
+  CreateDateColumn,
   DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { CommonEntity } from '../../common/entity/common.entity';
 
 // import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'user' })
-export class AuthEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ length: 20, unique: true })
+export class AuthEntity extends CommonEntity {
+  @Column({ length: 30, unique: true })
   username: string;
 
   @Exclude()
@@ -32,17 +32,4 @@ export class AuthEntity {
     default: 'user',
   })
   role: string;
-
-  @Column({
-    nullable: true,
-  })
-  created_at: Date;
-
-  @Column({
-    nullable: true,
-  })
-  updated_at: Date;
-
-  @DeleteDateColumn()
-  deleted_at: Date;
 }

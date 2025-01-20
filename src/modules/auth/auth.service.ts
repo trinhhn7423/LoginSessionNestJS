@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EditUserDto } from './dto/editUser.dto';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +43,7 @@ export class AuthService {
         );
       }
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -53,8 +53,10 @@ export class AuthService {
       skip: page,
       take: limit,
       where: { role: role },
+      withDeleted: false,
+      order: { created_at: 'DESC' },
     });
-    return plainToClass(AuthEntity, users);
+    return plainToInstance(AuthEntity, users);
   }
 
   async editUser(id: number, data: EditUserDto) {
@@ -62,17 +64,13 @@ export class AuthService {
       const findID = await this.authRepository.findOneBy({ id: id });
       console.log(data);
       if (findID) {
-        await this.authRepository.save({
-          id: findID.id,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          updated_at: new Date(),
-        });
-        return { message: 'Edit user successfully' };
+        await this.authRepository.update(id, data);
+        const updatedUser = await this.authRepository.findOneBy({ id });
+        return { message: 'Edit user successfully', data: updatedUser };
       }
       throw new NotFoundException('User not found ');
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -89,20 +87,21 @@ export class AuthService {
           HttpStatus.BAD_REQUEST,
         );
       }
+
       const slatRound = 10;
       const hash = await bcrypt.hash(data.password, slatRound);
-      const save = await this.authRepository.save({
+      const user = this.authRepository.create({
         ...data,
         password: hash,
-        created_at: new Date(),
       });
+      const savedUser = await this.authRepository.save(user);
 
       return {
         message: 'User created successfully',
-        data: plainToInstance(AuthEntity, save),
+        data: plainToInstance(AuthEntity, savedUser),
       };
     } catch (error) {
-      console.log(error.status);
+      // console.log(error.status);
       if (error.status !== 500) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
@@ -112,7 +111,11 @@ export class AuthService {
 
   async deleteUser(idUser: number) {
     try {
-      return await this.authRepository.softDelete(idUser);
+      const findDelete = await this.authRepository.softDelete(idUser);
+      if (findDelete) {
+        throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
+      }
+      return;
     } catch (e) {
       throw new HttpException(e.message, e.status);
     }
