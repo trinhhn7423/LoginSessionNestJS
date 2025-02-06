@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
@@ -7,7 +6,7 @@ import {
 } from 'typeorm';
 
 export abstract class CommonEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'tinyint' })
   id: number;
 
   @CreateDateColumn({

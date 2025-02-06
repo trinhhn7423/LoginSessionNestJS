@@ -16,39 +16,16 @@ import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { EditUserDto } from './dto/editUser.dto';
 
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(
-    @Body() body: LoginDto,
-    @Res() res: Response,
-    @Session() session: Record<string, any>,
-  ) {
-    // session.userData = '123';
-    // console.log('');
-    // console.log('req.body', req.session);
-
-    const resultLogin = await this.authService.login({
-      username: body.username,
-      password: body.password,
-    });
-    if (resultLogin) {
-      session.userData = {
-        id: resultLogin.id,
-        username: resultLogin.username,
-        role: resultLogin.role,
-      };
-      console.log('session.id login', session.id);
-      res
-        .status(201)
-        .json({ message: 'Login successfully', data: resultLogin });
-    } else {
-      res
-        .status(401)
-        .json({ message: 'Username not found or password is incorrect' });
-    }
+  async login(@Body() body: LoginDto, @Session() session: Record<string, any>) {
+    return await this.authService.login(
+      { username: body.username, password: body.password },
+      session,
+    );
   }
 
   @Post('register')
@@ -58,11 +35,6 @@ export class AuthController {
 
   @Get('session')
   getSession(@Session() session: Record<string, any>, @Res() res: Response) {
-    // if (sessionUser) {
-    //   res.json(sessionUser);
-    // } else {
-    //   res.status(401).json({ message: 'No active session' });
-    // }
     try {
       const sessionUser = session.userData;
       console.log('sessionUser', sessionUser);
@@ -77,7 +49,7 @@ export class AuthController {
     }
   }
 
-  @Get('clear_session')
+  @Get('logout')
   clearSession(
     @Req() req: Request,
     @Res() res: Response,
@@ -105,9 +77,8 @@ export class AuthController {
   getAllUser(
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('role') role: 'user' | 'admin',
+    @Query('role') role: string,
   ) {
-    // console.log(`${page} , ${limit}`);
     return this.authService.getAllUser(page, limit, role);
   }
 

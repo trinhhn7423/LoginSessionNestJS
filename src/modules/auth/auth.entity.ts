@@ -1,22 +1,18 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Column, Entity } from 'typeorm';
+import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import { CommonEntity } from '../../common/entity/common.entity';
 
-// import { Exclude } from 'class-transformer';
+export enum RoleUser {
+  ADMIN,
+  USER,
+}
 
 @Entity({ name: 'user' })
 export class AuthEntity extends CommonEntity {
   @Column({ length: 30, unique: true })
   username: string;
 
-  @Exclude()
+  @Exclude() // loai tru
   @Column({ nullable: false })
   password: string;
 
@@ -28,8 +24,15 @@ export class AuthEntity extends CommonEntity {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'user'],
-    default: 'user',
+    enum: RoleUser,
+    default: RoleUser.USER,
   })
-  role: string;
+  @Transform(
+    ({ value }: TransformFnParams) => {
+      // console.log('asdasdasd');
+      return RoleUser[value].toLowerCase();
+    },
+    { toClassOnly: true, toPlainOnly: false },
+  )
+  role: RoleUser;
 }

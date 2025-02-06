@@ -8,7 +8,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(
     session({
-      name: 'SESSION_ONCE',
+      name: 'SESSION_TWICE',
       secret: 'secret',
       resave: false, // Không lưu lại session nếu không thay đổi
       saveUninitialized: false, // Không lưu session trống

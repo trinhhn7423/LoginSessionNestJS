@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { AuthEntity } from './auth.entity';
+import { AuthEntity, RoleUser } from './auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
@@ -20,7 +20,10 @@ export class AuthService {
     private readonly authRepository: Repository<AuthEntity>,
   ) {}
 
-  async login(data: LoginDto): Promise<AuthEntity> {
+  async login(
+    data: LoginDto,
+    session: Record<string, any>,
+  ): Promise<{ message: string; data: AuthEntity }> {
     try {
       const user = await this.authRepository.findOne({
         where: { username: data.username },
@@ -33,9 +36,17 @@ export class AuthService {
         );
       }
       const isMatch = await bcrypt.compare(data.password, user.password);
+      // console.log('TypeRoleEnum.USER', );
       if (isMatch == true) {
-        const result = { ...user, password: undefined };
-        return result;
+        session.userData = {
+          id: user.id,
+          username: user.username,
+          role: user.role,
+        };
+        return {
+          message: 'Login successfully',
+          data: plainToInstance(AuthEntity, user),
+        };
       } else {
         throw new HttpException(
           'Username not found or password is incorrect',
@@ -43,51 +54,54 @@ export class AuthService {
         );
       }
     } catch (e) {
-      // console.log(e);
       throw new HttpException(e.message, e.status);
     }
   }
 
-  async getAllUser(page?: number, limit?: number, role?: 'user' | 'admin') {
+  async getAllUser(page?: number, limit?: number, role?: string) {
     const users: AuthEntity[] = await this.authRepository.find({
       skip: page,
       take: limit,
-      where: { role: role },
+      where: { role: RoleUser[role?.toLowerCase()] },
       withDeleted: false,
       order: { created_at: 'DESC' },
     });
     return plainToInstance(AuthEntity, users);
   }
 
-  async editUser(id: number, data: EditUserDto) {
-    try {
-      const findID = await this.authRepository.findOneBy({ id: id });
-      console.log(data);
-      if (findID) {
-        await this.authRepository.update(id, data);
-        const updatedUser = await this.authRepository.findOneBy({ id });
-        return { message: 'Edit user successfully', data: updatedUser };
-      }
+  async findById(id: number) {
+    const user = await this.authRepository.findOneBy({ id });
+    if (!user) {
       throw new NotFoundException('User not found ');
-    } catch (e) {
-      // console.log(e);
-      throw new HttpException(e.message, e.status);
     }
+    return user;
   }
 
-  async createUser(data: CreateUserDto) {
+  async editUser(id: number, data: EditUserDto) {
+    const updatedUser = await this.authRepository.findOneBy({ id });
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+    updatedUser.firstname = data.firstname;
+    updatedUser.lastname = data.lastname;
+    updatedUser.updated_at = new Date();
+    await this.authRepository.save(updatedUser);
+    return { message: 'Edit user successfully', data: updatedUser };
+  }
+
+  async createUser(
+    data: CreateUserDto,
+  ): Promise<{ message: string; data: AuthEntity }> {
     try {
       const findUser = await this.authRepository.findOne({
         where: { username: data.username },
       });
-      console.log('finuser', findUser);
       if (findUser) {
         throw new HttpException(
           'Username already exists',
           HttpStatus.BAD_REQUEST,
         );
       }
-
       const slatRound = 10;
       const hash = await bcrypt.hash(data.password, slatRound);
       const user = this.authRepository.create({
@@ -101,7 +115,6 @@ export class AuthService {
         data: plainToInstance(AuthEntity, savedUser),
       };
     } catch (error) {
-      // console.log(error.status);
       if (error.status !== 500) {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
