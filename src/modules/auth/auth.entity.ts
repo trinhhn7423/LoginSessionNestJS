@@ -1,38 +1,55 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import { CommonEntity } from '../../common/entity/common.entity';
+import { IsEmail } from 'class-validator';
+import { RoleEntity } from '../role/role.entity';
 
-export enum RoleUser {
-  ADMIN,
-  USER,
+export enum UserStatus {
+  WORKING,
+  RESIGNED,
 }
 
-@Entity({ name: 'user' })
+@Entity({ name: 'User' })
 export class AuthEntity extends CommonEntity {
-  @Column({ length: 30, unique: true })
-  username: string;
+  @ManyToOne(() => AuthEntity, { nullable: true })
+  @JoinColumn({ name: 'manager_id' })
+  manager: AuthEntity;
+
+  @Column({ nullable: true, unique: true, length: 50 })
+  email: string;
 
   @Exclude() // loai tru
   @Column({ nullable: false })
   password: string;
 
   @Column({ nullable: false })
-  firstname: string;
+  fullName: string;
 
-  @Column({ nullable: false })
-  lastname: string;
+  @Column({ nullable: true, unique: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @ManyToOne(() => RoleEntity, { eager: true })
+  @JoinColumn({ name: 'role_id' })
+  role: RoleEntity;
 
   @Column({
     type: 'enum',
-    enum: RoleUser,
-    default: RoleUser.USER,
+    enum: UserStatus,
+    default: null,
+    nullable: true,
   })
   @Transform(
     ({ value }: TransformFnParams) => {
-      // console.log('asdasdasd');
-      return RoleUser[value].toLowerCase();
+      if (value === null) return null;
+      return `${UserStatus[value].toLowerCase()}`;
     },
-    { toClassOnly: true, toPlainOnly: false },
+    {
+      toPlainOnly: true, //biến đổi khi chuyển từ class sang object ,    ,,instanceToPlain
+      toClassOnly: false, // biến đổi từ object sang class ,, plainToInstance
+    },
   )
-  role: RoleUser;
+  status: UserStatus;
 }

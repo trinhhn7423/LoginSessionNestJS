@@ -9,12 +9,12 @@ import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthEntity } from './auth.entity';
 import { AuthMiddleware } from './auth.middleware';
+import { RoleEntity } from '../role/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AuthEntity])],
+  imports: [TypeOrmModule.forFeature([AuthEntity, RoleEntity])],
   controllers: [AuthController],
   providers: [AuthService],
-  exports: [],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

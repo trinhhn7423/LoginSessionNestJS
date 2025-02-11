@@ -1,24 +1,26 @@
 import {
+  Column,
   CreateDateColumn,
-  DeleteDateColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 export abstract class CommonEntity {
-  @PrimaryGeneratedColumn({ type: 'tinyint' })
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @CreateDateColumn({
-    nullable: true,
-  })
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   @UpdateDateColumn({
-    nullable: true,
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
 
-  @DeleteDateColumn()
-  deleted_at: Date;
+  @Exclude()
+  @Column({ type: 'boolean', default: false })
+  isDelete: boolean;
 }

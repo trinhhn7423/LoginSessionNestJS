@@ -1,11 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import * as session from 'express-session';
+import { HttpExceptionFilter } from './common/HttpExceptionFilter/HttpExceptionFilter ';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
   app.use(
     session({
       name: 'SESSION_TWICE',
@@ -14,7 +22,7 @@ async function bootstrap() {
       saveUninitialized: false, // Không lưu session trống
       cookie: {
         secure: false,
-        httpOnly: true, // Cookie chỉ được gửi qua HTTP
+        httpOnly: false, // Cookie chỉ được gửi qua HTTP
         maxAge: 2000000,
       },
     }),
