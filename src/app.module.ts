@@ -15,6 +15,8 @@ const typeOrmOption: TypeOrmModuleOptions = {
   database: 'test',
   entities: [AuthEntity, RoleEntity],
   synchronize: false,
+  // logging: true,z
+
 };
 
 @Module({

@@ -1,10 +1,19 @@
 import {
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { Repository, Like, FindOptionsWhere } from 'typeorm';
+import {
+  Between,
+  FindManyOptions,
+  FindOptionsWhere,
+  Like,
+  Not,
+  Repository,
+} from 'typeorm';
 import { AuthEntity } from './auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -13,8 +22,9 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { EditUserDto } from './dto/editUser.dto';
 import { RoleEntity } from '../role/role.entity';
 import { CreateEmployeeDto } from './dto/createEmployee.dto';
+import { Request } from 'express';
 
-interface userSessionType {
+export interface userSessionType {
   id: number;
   email: string;
   fullName: string;
@@ -39,14 +49,20 @@ export class AuthService {
     data: LoginDto,
     session: Record<string, userSessionType>,
   ): Promise<{ message: string; data: AuthEntity }> {
+    if (!data.email && !data.phone)
+      throw new HttpException(
+        'Email or phone is required',
+        HttpStatus.BAD_REQUEST,
+      );
     const user = await this.authRepository.findOne({
       where: {
         email: data.email,
         phone: data.phone,
         isDelete: false,
       },
-      relations: ['manager', 'role'],
+      relations: ['role'],
     });
+    // console.log('user', user);
     if (!user) {
       throw new HttpException(
         'Username not found or password is incorrect',
@@ -110,51 +126,106 @@ export class AuthService {
     return users;
   }
 
-  async createEmployee(body: CreateEmployeeDto, id: number) {
-    const manager = await this.authRepository.findOne({ where: { id } });
-    if (manager.role.name == 'MANAGER') {
-      const role = await this.roleRepository.findOne({
-        where: { id: body.id_role },
-      });
-      if (!role) {
-        throw new HttpException('Role not found', HttpStatus.NOT_FOUND);
-      }
-      const slatRound = 10;
-      const hash = await bcrypt.hash(body.password, slatRound);
-      const user = this.authRepository.create({
-        password: hash,
-        fullName: body.fullname,
-        phone: body.phone,
-        address: body.address,
-        role: role,
-        manager: manager,
-        status: body.status,
-      });
-      await this.authRepository.save(user);
-      return user;
-    } else {
-      throw new HttpException('You are not manager', HttpStatus.FORBIDDEN);
+  async createEmployee(
+    body: CreateEmployeeDto,
+    session: Record<string, userSessionType>,
+  ) {
+    const idUser = session.userData;
+    if (!idUser || idUser.role !== 'MANAGER')
+      throw new ForbiddenException('you are not manager');
+
+    const role = await this.roleRepository.findOne({
+      where: { id: body.id_role },
+    });
+    if (!role) {
+      throw new HttpException('Role not found', HttpStatus.NOT_FOUND);
     }
+    const slatRound = 10;
+    const hash = await bcrypt.hash(body.password, slatRound);
+    const user = this.authRepository.create({
+      password: hash,
+      fullName: body.fullname,
+      phone: body.phone,
+      address: body.address,
+      role: role,
+      managerId: idUser.id,
+      status: body.status,
+    });
+    await this.authRepository.save(user);
+    return user;
   }
 
-  async getAllEmployeeByIdManager(id: number) {
+  async getAllEmployeeByIdManager(
+    search?: string,
+    page?: number,
+    limit?: number,
+    roleQuery?: string,
+    createAt?: string,
+    status?: number,
+    session?: Record<string, userSessionType>,
+  ) {
+    const idUser = session?.userData?.id;
     const user = await this.authRepository.findOne({
-      where: { id: id },
-      relations: ['manager'],
+      where: { id: idUser },
+      relations: ['role'],
     });
-    // console.log('user', user);
-    if (user?.role?.name == 'MANAGER') {
-      console.log('go here');
-      return await this.authRepository.find({
-        where: { manager: user },
-      });
-    }
-    if (user?.manager?.role?.name == 'MANAGER') {
-      console.log('go here2');
 
-      return await this.authRepository.find({
-        where: { manager: { id: user.id } },
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user?.role?.name === 'MANAGER' || user?.managerId) {
+      const whereConditions: FindOptionsWhere<AuthEntity>[] = [];
+
+      const baseCondition: FindOptionsWhere<AuthEntity> = {
+        managerId: user.managerId || user.id,
+      };
+
+      if (search) {
+        whereConditions.push(
+          { ...baseCondition, email: Like(`%${search}%`) },
+          { ...baseCondition, phone: Like(`%${search}%`) },
+          { ...baseCondition, fullName: Like(`%${search}%`) },
+        );
+      } else {
+        whereConditions.push(baseCondition);
+      }
+      if (roleQuery) {
+        const findRole = await this.roleRepository.findOne({
+          where: { name: roleQuery },
+        });
+        if (!findRole) throw new NotFoundException('Not found role');
+        whereConditions.forEach((condition) => {
+          condition.role = findRole;
+        });
+      }
+
+      if (status !== undefined) {
+        whereConditions.forEach((condition) => {
+          condition.status = status;
+        });
+      }
+      if (createAt) {
+        const startDate = new Date(createAt);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(createAt);
+        endDate.setHours(23, 59, 59, 999);
+
+        whereConditions.forEach((condition) => {
+          condition.created_at = Between(startDate, endDate);
+        });
+      }
+      console.log('whereCondition', whereConditions);
+      let listEmployee = await this.authRepository.find({
+        where: whereConditions,
+        skip: page,
+        take: limit,
+        relations: ['role'],
+        withDeleted: false,
+        order: { created_at: 'DESC' },
       });
+      if (user.managerId) {
+        listEmployee = listEmployee.filter((index) => index.id !== user.id);
+      }
+      return listEmployee;
     }
   }
 

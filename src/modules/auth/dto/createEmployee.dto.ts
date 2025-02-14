@@ -1,20 +1,20 @@
 import {
-  IsEmail,
+  IsEmail, IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Length,
   MaxLength,
-  MinLength,
-} from 'class-validator';
+  MinLength
+} from "class-validator";
 import { UserStatus } from '../auth.entity';
 
 export class CreateEmployeeDto {
-  @IsEmail()
-  @IsNotEmpty()
-  @Length(5, 30)
-  email?: string;
+  // @IsEmail()
+  // @IsNotEmpty()
+  // @Length(5, 30)
+  // email?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -43,6 +43,7 @@ export class CreateEmployeeDto {
   id_role: number;
 
   @IsNumber()
+  @IsEnum(UserStatus)
   status: UserStatus;
 
   // @IsString()

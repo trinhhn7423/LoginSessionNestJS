@@ -15,7 +15,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService, userSessionType } from './auth.service';
 import { Request, Response } from 'express';
 import { LoginDto } from './dto/login.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -24,7 +24,7 @@ import { CreateEmployeeDto } from './dto/createEmployee.dto';
 import { AuthGuard } from './auth.guard';
 
 @Controller({ version: '1', path: '/auth' })
-@UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(ClassSerializerInterceptor) //tự động biến đổi  dữ liệu trả về từ controller trước khi gửi cho client.
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -41,17 +41,40 @@ export class AuthController {
     return await this.authService.createUser(body);
   }
 
+  roleDepartment = ['MANAGER', 'DEPARTMENT'];
+
   @SetMetadata('roles', ['MANAGER'])
   @UseGuards(AuthGuard)
-  @Post('employee/:id')
-  createEmployee(@Body() body: CreateEmployeeDto, @Param('id') id: number) {
-    return this.authService.createEmployee(body, id);
+  @Post('employee')
+  createEmployee(
+    @Body() body: CreateEmployeeDto,
+    @Session() session: Record<string, userSessionType>,
+  ) {
+    return this.authService.createEmployee(body, session);
   }
 
   // @UseGuards(AuthGuard)
-  @Get('employee/:id')
-  getAllEmployeeByIdManager(@Param('id') id: number) {
-    return this.authService.getAllEmployeeByIdManager(id);
+  @Get('employee')
+  getAllEmployeeByIdManager(
+    // @Param('id') id: number,
+    @Query('search') search: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('role') role: string,
+    @Query('crateAt') createAt: string,
+    @Query('status') status: number,
+    @Session() session: Record<string, userSessionType>,
+  ) {
+    return this.authService.getAllEmployeeByIdManager(
+      // id,
+      search,
+      page,
+      limit,
+      role,
+      createAt,
+      status,
+      session,
+    );
   }
 
   @Get('session')

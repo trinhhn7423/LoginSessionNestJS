@@ -14,7 +14,13 @@ export class RoleService {
     return this.roleRepository.find({ where: { name: Not('MANAGER') } });
   }
 
-  createRole(nameRole: string) {
+  async createRole(nameRole: string) {
+    const existingRole = await this.roleRepository.findOne({
+      where: { name: nameRole },
+    });
+    if (existingRole) {
+      throw new Error('Role already exists');
+    }
     return this.roleRepository.save({ name: nameRole });
   }
 }

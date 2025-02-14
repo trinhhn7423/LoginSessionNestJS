@@ -11,9 +11,10 @@ export enum UserStatus {
 
 @Entity({ name: 'User' })
 export class AuthEntity extends CommonEntity {
-  @ManyToOne(() => AuthEntity, { nullable: true })
-  @JoinColumn({ name: 'manager_id' })
-  manager: AuthEntity;
+  // @ManyToOne(() => AuthEntity, { nullable: true })
+  // @JoinColumn({ name: 'manager_id' })
+  @Column({ nullable: true })
+  managerId: number;
 
   @Column({ nullable: true, unique: true, length: 50 })
   email: string;
