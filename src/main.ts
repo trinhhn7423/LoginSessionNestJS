@@ -3,12 +3,18 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import * as session from 'express-session';
 import { HttpExceptionFilter } from './common/HttpExceptionFilter/HttpExceptionFilter ';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:5175'],
+    credentials: true,
+  });
+  app.use(cookieParser());
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -22,8 +28,9 @@ async function bootstrap() {
       saveUninitialized: false, // Không lưu session trống
       cookie: {
         secure: false,
-        httpOnly: false, // Cookie chỉ được gửi qua HTTP
+        httpOnly: true, // Cookie chỉ được gửi qua HTTP
         maxAge: 2000000,
+        sameSite: 'none',
       },
     }),
   );

@@ -22,6 +22,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { EditUserDto } from './dto/editUser.dto';
 import { CreateEmployeeDto } from './dto/createEmployee.dto';
 import { AuthGuard } from './auth.guard';
+import { EditEmployeeDto } from './dto/editEmployee.dto';
 
 @Controller({ version: '1', path: '/auth' })
 @UseInterceptors(ClassSerializerInterceptor) //tự động biến đổi  dữ liệu trả về từ controller trước khi gửi cho client.
@@ -29,7 +30,12 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() body: LoginDto, @Session() session: Record<string, any>) {
+  async login(
+    @Body() body: LoginDto,
+    @Session() session: Record<string, any>,
+    // @Res() res: Response,
+  ) {
+    // res.cookie('trinh', 'teststetset');
     return await this.authService.login(
       { email: body.email, password: body.password, phone: body.phone },
       session,
@@ -53,7 +59,7 @@ export class AuthController {
     return this.authService.createEmployee(body, session);
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get('employee')
   getAllEmployeeByIdManager(
     // @Param('id') id: number,
@@ -68,8 +74,8 @@ export class AuthController {
     return this.authService.getAllEmployeeByIdManager(
       // id,
       search,
-      page,
-      limit,
+      // page,
+      // limit,
       role,
       createAt,
       status,
@@ -135,9 +141,22 @@ export class AuthController {
     return this.authService.editUser(id, body);
   }
 
+  // @SetMetadata('roles', ['MANAGER'])
+  // @UseGuards(AuthGuard)
+  // @Delete(':id')
+  // deleteEntity(@Param('id') id: number) {
+  //   return this.authService.deleteUser(id);
+  // }
+
+  @SetMetadata('roles', ['MANAGER'])
   @UseGuards(AuthGuard)
-  @Delete(':id')
-  deleteUser(@Param('id') id: number) {
-    return this.authService.deleteUser(id);
+  @Put('employee/:id')
+  editEmployee(
+    @Param('id') id: number,
+    @Body() body: EditEmployeeDto,
+    @Session() session: Record<string, userSessionType>,
+  ) {
+    // return { id, body };
+    return this.authService.editEmployee(id, body, session);
   }
 }

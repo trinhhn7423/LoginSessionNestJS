@@ -45,12 +45,12 @@ export class AuthEntity extends CommonEntity {
   @Transform(
     ({ value }: TransformFnParams) => {
       if (value === null) return null;
-      return `${UserStatus[value].toLowerCase()}`;
+      return `${UserStatus[value]?.toLowerCase()}`;
     },
     {
       toPlainOnly: true, //biến đổi khi chuyển từ class sang object ,    ,,instanceToPlain
       toClassOnly: false, // biến đổi từ object sang class ,, plainToInstance
     },
   )
-  status: UserStatus;
+  status: number;
 }

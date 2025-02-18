@@ -14,7 +14,7 @@ import {
   Not,
   Repository,
 } from 'typeorm';
-import { AuthEntity } from './auth.entity';
+import { AuthEntity, UserStatus } from './auth.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
@@ -23,6 +23,7 @@ import { EditUserDto } from './dto/editUser.dto';
 import { RoleEntity } from '../role/role.entity';
 import { CreateEmployeeDto } from './dto/createEmployee.dto';
 import { Request } from 'express';
+import { EditEmployeeDto } from './dto/editEmployee.dto';
 
 export interface userSessionType {
   id: number;
@@ -49,6 +50,7 @@ export class AuthService {
     data: LoginDto,
     session: Record<string, userSessionType>,
   ): Promise<{ message: string; data: AuthEntity }> {
+    console.log('data', data);
     if (!data.email && !data.phone)
       throw new HttpException(
         'Email or phone is required',
@@ -157,14 +159,15 @@ export class AuthService {
 
   async getAllEmployeeByIdManager(
     search?: string,
-    page?: number,
-    limit?: number,
+    // page?: number,
+    // limit?: number,
     roleQuery?: string,
     createAt?: string,
     status?: number,
     session?: Record<string, userSessionType>,
   ) {
     const idUser = session?.userData?.id;
+    // console.log('idUser', idUser);
     const user = await this.authRepository.findOne({
       where: { id: idUser },
       relations: ['role'],
@@ -198,7 +201,7 @@ export class AuthService {
         });
       }
 
-      if (status !== undefined) {
+      if (status == 0 || status ==1) {
         whereConditions.forEach((condition) => {
           condition.status = status;
         });
@@ -213,11 +216,11 @@ export class AuthService {
           condition.created_at = Between(startDate, endDate);
         });
       }
-      console.log('whereCondition', whereConditions);
+      // console.log('whereCondition', whereConditions);
       let listEmployee = await this.authRepository.find({
         where: whereConditions,
-        skip: page,
-        take: limit,
+        // skip: page ,
+        // take: limit,
         relations: ['role'],
         withDeleted: false,
         order: { created_at: 'DESC' },
@@ -227,6 +230,34 @@ export class AuthService {
       }
       return listEmployee;
     }
+  }
+
+  async editEmployee(
+    id: number,
+    body: EditEmployeeDto,
+    session: Record<string, userSessionType>,
+  ) {
+    const findEmployee = await this.authRepository.findOne({
+      where: { id: id },
+    });
+    if (!findEmployee) throw new NotFoundException('Not found Employee');
+    // if (findEmployee.managerId !== session.userData.id)
+    //   throw new ForbiddenException('Unauthorized');
+    if (body.role) {
+      const findRole = await this.roleRepository.findOne({
+        where: { id: body.role },
+      });
+      if (!findRole) throw new NotFoundException('Not found role');
+      findEmployee.role = findRole;
+    }
+    findEmployee.email = body.email;
+    findEmployee.phone = body.phone;
+    // console.log('body.status', );
+    findEmployee.status = body.status; //nhan vao so
+    findEmployee.address = body.address;
+    findEmployee.fullName = body.fullname;
+    findEmployee.updated_at = new Date();
+    return await this.authRepository.save(findEmployee);
   }
 
   async findById(id: number) {
@@ -293,17 +324,17 @@ export class AuthService {
     }
   }
 
-  async deleteUser(idUser: number) {
-    try {
-      const findDelete = await this.authRepository.findOneBy({ id: idUser });
-      if (!findDelete) {
-        throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
-      }
-      findDelete.isDelete = true;
-      await this.authRepository.save(findDelete);
-      return findDelete;
-    } catch (e) {
-      throw new HttpException(e.message, e.status);
-    }
-  }
+  // async deleteUser(idUser: number) {
+  //   try {
+  //     const findDelete = await this.authRepository.findOneBy({ id: idUser });
+  //     if (!findDelete) {
+  //       throw new HttpException('Not found user', HttpStatus.NOT_FOUND);
+  //     }
+  //     findDelete.isDelete = true;
+  //     await this.authRepository.save(findDelete);
+  //     return findDelete;
+  //   } catch (e) {
+  //     throw new HttpException(e.message, e.status);
+  //   }
+  // }
 }

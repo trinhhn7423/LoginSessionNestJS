@@ -22,8 +22,9 @@ export class AuthGuard implements CanActivate {
     const request: Record<string, any> = context
       .switchToHttp()
       .getRequest<Request>();
-    const userRole = request?.session?.userData?.role;
-    // console.log('userRole', userRole);
+    const userRole = request?.session;
+    // console.log(userRole);
+    // console.log('request', request.headers);
     // console.log('requiredRoles', requiredRoles?.includes(userRole));
     if (!userRole) {
       throw new UnauthorizedException('You are not authorized');
