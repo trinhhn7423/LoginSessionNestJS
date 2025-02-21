@@ -159,13 +159,15 @@ export class AuthService {
 
   async getAllEmployeeByIdManager(
     search?: string,
-    // page?: number,
-    // limit?: number,
+    page: number = 1,
+    limit: number = 10,
     roleQuery?: string,
     createAt?: string,
     status?: number,
     session?: Record<string, userSessionType>,
   ) {
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
     const idUser = session?.userData?.id;
     // console.log('idUser', idUser);
     const user = await this.authRepository.findOne({
@@ -201,7 +203,7 @@ export class AuthService {
         });
       }
 
-      if (status == 0 || status ==1) {
+      if (status == 0 || status == 1) {
         whereConditions.forEach((condition) => {
           condition.status = status;
         });
@@ -216,11 +218,10 @@ export class AuthService {
           condition.created_at = Between(startDate, endDate);
         });
       }
-      // console.log('whereCondition', whereConditions);
       let listEmployee = await this.authRepository.find({
         where: whereConditions,
-        // skip: page ,
-        // take: limit,
+        skip: (page - 1) * limit,
+        take: limit,
         relations: ['role'],
         withDeleted: false,
         order: { created_at: 'DESC' },
@@ -228,7 +229,11 @@ export class AuthService {
       if (user.managerId) {
         listEmployee = listEmployee.filter((index) => index.id !== user.id);
       }
-      return listEmployee;
+      return {
+        listEmployee: listEmployee,
+        page: page,
+        limit: limit,
+      };
     }
   }
 

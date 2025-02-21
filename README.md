@@ -74,11 +74,106 @@ ServiceUnavailableException
 GatewayTimeoutException
 PreconditionFailedException
 
-
-
-nhân viên có nhiều vai trò 
+nhân viên có nhiều vai trò
 khi đăng ký thành công role là customer
 Department ///
+
+các kiểu quan hệ trong typeORM
+
+1. One-to-One (1-1)
+   Quan hệ 1-1 , ví dụ : một người có một profile
+
+@Entity()
+export class User {
+@PrimaryGeneratedColumn()
+id: number;
+
+@OneToOne(() => Profile, (profile) => profile.user)
+@JoinColumn() // Chỉ định khóa ngoại
+profile: Profile;
+}
+
+@Entity()
+export class Profile {
+@PrimaryGeneratedColumn()
+id: number;
+
+@Column()
+bio: string;
+
+@OneToOne(() => User, (user) => user.profile)
+user: User;
+}
+
+2. One-to-Many & Many-to-One (1-N,N-1)
+   Quan hệ một nhiều , ví dụ một tác giả có nhiều bài viết
+
+@Entity()
+export class Author {
+@PrimaryGeneratedColumn()
+id: number;
+
+@OneToMany(() => Post, (post) => post.author)
+posts: Post[];
+}
+
+@Entity()
+export class Post {
+@PrimaryGeneratedColumn()
+id: number;
+
+@Column()
+title: string;
+
+@ManyToOne(() => Author, (author) => author.posts)
+@JoinColumn()
+author: Author;
+}
+
+3. Many-to-Many(N-N)
+   Quan hệ nhiều-nhiều ví dụ: Một học sinh có thể tham gia nhiều khóa học có nhiều học sinh
+   @Entity()
+   export class Student {
+   @PrimaryGeneratedColumn()
+   id: number;
+
+@ManyToMany(() => Course, (course) => course.students)
+@JoinTable()
+courses: Course[];
+}
+
+@Entity()
+export class Course {
+@PrimaryGeneratedColumn()
+id: number;
+
+@Column()
+name: string;
+
+@ManyToMany(() => Student, (student) => student.courses)
+students: Student[];
+}
+
+4.Self-referencing (Quan hệ tỏng cùng một bảng)
+Dùng khi có mỗi quan hệ giữa các bản ghi trong cùng một bảng , ví dụ : một nhân viên có một người quản lý
+@Entity()
+export class Employee {
+@PrimaryGeneratedColumn()
+id: number;
+
+@Column()
+name: string;
+
+@ManyToOne(() => Employee, (employee) => employee.subordinates, { nullable: true }) // nhiều nhân viên có một người quản lý 
+@JoinColumn()
+manager: Employee;
+
+@OneToMany(() => Employee, (employee) => employee.manager)  một qunar lý , quản lý nhiều nhân viên 
+subordinates: Employee[];
+}
+
+
+
 
 
 

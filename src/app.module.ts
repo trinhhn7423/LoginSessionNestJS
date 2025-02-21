@@ -5,6 +5,10 @@ import { AuthEntity } from './modules/auth/auth.entity';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { RoleModule } from './modules/role/role.module';
 import { RoleEntity } from './modules/role/role.entity';
+import { ProductModule } from './modules/product/product.module';
+import { ProductEntity } from './modules/product/entity/product.entity';
+import { ProductAttribute } from './modules/product/entity/product_attribute.entity';
+import { ProductAttributeValue } from './modules/product/entity/product_attribute_value.entity';
 
 const typeOrmOption: TypeOrmModuleOptions = {
   type: 'mysql',
@@ -13,10 +17,15 @@ const typeOrmOption: TypeOrmModuleOptions = {
   username: 'root',
   password: '',
   database: 'test',
-  entities: [AuthEntity, RoleEntity],
+  entities: [
+    AuthEntity,
+    RoleEntity,
+    ProductEntity,
+    ProductAttribute,
+    ProductAttributeValue,
+  ],
   synchronize: false,
-  // logging: true,z
-
+  // logging: true,
 };
 
 @Module({
@@ -24,6 +33,7 @@ const typeOrmOption: TypeOrmModuleOptions = {
     TypeOrmModule.forRoot(typeOrmOption),
     AuthModule,
     RoleModule,
+    ProductModule,
     // EmployeeModule,
     // ScheduleModule.forRoot(),
   ],

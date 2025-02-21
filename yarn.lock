@@ -1621,6 +1621,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/streamifier@npm:^0":
+  version: 0.1.2
+  resolution: "@types/streamifier@npm:0.1.2"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/475f787ae2b992a22f3b794ad0920d2b43e0541d126020c1edb25ebd60b736122d1c4db6813aa8fa9ad5cfed49b700a1e6ee5154acabac2ebc2bed7b40c0d667
+  languageName: node
+  linkType: hard
+
 "@types/superagent@npm:^8.1.0":
   version: 8.1.9
   resolution: "@types/superagent@npm:8.1.9"
@@ -5442,6 +5451,7 @@ __metadata:
     "@types/jest": "npm:^29.5.2"
     "@types/multer": "npm:^1.4.12"
     "@types/node": "npm:^20.3.1"
+    "@types/streamifier": "npm:^0"
     "@types/supertest": "npm:^6.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.0.0"
     "@typescript-eslint/parser": "npm:^8.0.0"
@@ -5459,11 +5469,14 @@ __metadata:
     ioredis: "npm:^5.4.2"
     jest: "npm:^29.5.0"
     mongodb: "npm:^6.12.0"
+    multer: "npm:^1.4.5-lts.1"
+    multer-storage-cloudinary: "npm:^4.0.0"
     mysql2: "npm:^3.12.0"
     prettier: "npm:^3.0.0"
     reflect-metadata: "npm:^0.2.0"
     rxjs: "npm:^7.8.1"
     source-map-support: "npm:^0.5.21"
+    streamifier: "npm:^0.1.1"
     supertest: "npm:^7.0.0"
     ts-jest: "npm:^29.1.0"
     ts-loader: "npm:^9.4.3"
@@ -5920,6 +5933,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"multer-storage-cloudinary@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "multer-storage-cloudinary@npm:4.0.0"
+  peerDependencies:
+    cloudinary: ^1.21.0
+  checksum: 10c0/febbed4bbb6153b7db04c2574e43d446a8fdd9fed731928ffa6afee8f2495acaeb72e09cf785efa34848bcf415cca95532a664f80e93b901f4181babf44ee00b
+  languageName: node
+  linkType: hard
+
 "multer@npm:1.4.4-lts.1":
   version: 1.4.4-lts.1
   resolution: "multer@npm:1.4.4-lts.1"
@@ -5932,6 +5954,21 @@ __metadata:
     type-is: "npm:^1.6.4"
     xtend: "npm:^4.0.0"
   checksum: 10c0/63277d3483869f424274ef8ce6ab7ff4ce9d2c1cc69e707fc8b5d9b2b348ae6f742809e0b357a591dea885d147594bcd06528d3d6bbe32046115d4a7e126b954
+  languageName: node
+  linkType: hard
+
+"multer@npm:^1.4.5-lts.1":
+  version: 1.4.5-lts.1
+  resolution: "multer@npm:1.4.5-lts.1"
+  dependencies:
+    append-field: "npm:^1.0.0"
+    busboy: "npm:^1.0.0"
+    concat-stream: "npm:^1.5.2"
+    mkdirp: "npm:^0.5.4"
+    object-assign: "npm:^4.1.1"
+    type-is: "npm:^1.6.4"
+    xtend: "npm:^4.0.0"
+  checksum: 10c0/4c6c91e93e510c99e791b6520e3e2f4a227a57f4f509427ff7f3a6f4cc0b4b09ad77c475f629c12f7ae01dba11645b2bd6568877cab775de8bf853b0a67259b4
   languageName: node
   linkType: hard
 
@@ -7179,6 +7216,13 @@ __metadata:
   version: 2.0.1
   resolution: "statuses@npm:2.0.1"
   checksum: 10c0/34378b207a1620a24804ce8b5d230fea0c279f00b18a7209646d5d47e419d1cc23e7cbf33a25a1e51ac38973dc2ac2e1e9c647a8e481ef365f77668d72becfd0
+  languageName: node
+  linkType: hard
+
+"streamifier@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "streamifier@npm:0.1.1"
+  checksum: 10c0/132035d8519c65f3903047b06b003201d3eaef6eb164cf5ba86ee22c2203c3a0109198946dc579002e39f704b568bedc8ce61a729e0a8dd00249d0a9658353a4
   languageName: node
   linkType: hard
 

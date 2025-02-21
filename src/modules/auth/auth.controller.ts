@@ -74,8 +74,8 @@ export class AuthController {
     return this.authService.getAllEmployeeByIdManager(
       // id,
       search,
-      // page,
-      // limit,
+      page,
+      limit,
       role,
       createAt,
       status,
@@ -123,17 +123,17 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Get('users')
-  getAllUser(
-    @Query('search') search: string,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query('role') role: string,
-    @Query('crateAt') createAt: string,
-  ) {
-    return this.authService.getAllUser(search, page, limit, role, createAt);
-  }
+  // @UseGuards(AuthGuard)
+  // @Get('users')
+  // getAllUser(
+  //   @Query('search') search: string,
+  //   @Query('page') page: number,
+  //   @Query('limit') limit: number,
+  //   @Query('role') role: string,
+  //   @Query('crateAt') createAt: string,
+  // ) {
+  //   return this.authService.getAllUser(search, page, limit, role, createAt);
+  // }
 
   @UseGuards(AuthGuard)
   @Put(':id')

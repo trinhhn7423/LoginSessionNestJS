@@ -8,10 +8,17 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+
+      // whitelist: true,
+      // forbidNonWhitelisted: true,
+    }),
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:5175'],
+    origin: 'http://localhost:5173',
     credentials: true,
   });
   app.use(cookieParser());
@@ -30,7 +37,7 @@ async function bootstrap() {
         secure: false,
         httpOnly: true, // Cookie chỉ được gửi qua HTTP
         maxAge: 2000000,
-        sameSite: 'none',
+        // sameSite: 'none',
       },
     }),
   );
