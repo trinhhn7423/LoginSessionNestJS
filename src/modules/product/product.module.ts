@@ -9,11 +9,17 @@ import { AuthEntity } from '../auth/auth.entity';
 import { ProductEntity } from './entity/product.entity';
 import { ProductAttribute } from './entity/product_attribute.entity';
 import { ProductAttributeValue } from './entity/product_attribute_value.entity';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   // imports: [TypeOrmModule.forFeature([EmployeeEntity, AuthEntity])],
   imports: [
     CloudinaryModule,
+    // MulterModule.register({
+    //   storage: {
+
+    //   }
+    // }),
     TypeOrmModule.forFeature([
       ProductEntity,
       ProductAttribute,

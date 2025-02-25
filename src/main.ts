@@ -4,9 +4,11 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import * as session from 'express-session';
 import { HttpExceptionFilter } from './common/HttpExceptionFilter/HttpExceptionFilter ';
 import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -18,10 +20,14 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+    // origin: 'http://localhost:5173',
+    // credentials: true,
   });
   app.use(cookieParser());
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads',
+  });
 
   app.enableVersioning({
     type: VersioningType.URI,

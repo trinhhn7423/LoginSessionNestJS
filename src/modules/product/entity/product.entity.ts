@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { CommonEntity } from '../../../common/entity/common.entity';
 import { Post } from '@nestjs/common';
 import { AuthEntity } from '../../auth/auth.entity';
@@ -19,6 +26,9 @@ export class ProductEntity extends CommonEntity {
   unit: string;
 
   @Column({ nullable: false })
+  branch: string;
+
+  @Column({ nullable: false })
   description: string;
 
   @Column({ nullable: false })
@@ -30,19 +40,18 @@ export class ProductEntity extends CommonEntity {
   @Column({ nullable: false })
   cost: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   image: string;
 
   @Column({ nullable: false })
   quantity: number;
 
-  @OneToOne(() => AuthEntity)
-  @JoinColumn()
+  @ManyToOne(() => AuthEntity, { onDelete: 'CASCADE' })
   createBy: AuthEntity;
 
   @OneToMany(() => ProductAttribute, (attribute) => attribute.product, {
     // trỏ đến thuộc tính product trong ProductAttribute
+    // một sản phẩm có nhiều thuộc tính
   })
-  @JoinColumn()
   attributes: ProductAttribute[];
 }

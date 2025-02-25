@@ -1,4 +1,5 @@
 import {
+  ArrayNotEmpty,
   IsArray,
   IsNotEmpty,
   IsString,
@@ -16,6 +17,7 @@ export class Product_attributeDto {
 
   @IsArray()
   @IsNotEmpty()
+  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => Product_attribute_valueDto)
   attribute: Product_attribute_valueDto[];

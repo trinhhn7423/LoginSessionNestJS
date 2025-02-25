@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { ProductEntity } from './product.entity';
 import { ProductAttributeValue } from './product_attribute_value.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('product_attribute')
 export class ProductAttribute {
@@ -21,6 +22,7 @@ export class ProductAttribute {
   })
   values: ProductAttributeValue[];
 
+  @Exclude()
   @ManyToOne(() => ProductEntity, (product) => product.attributes, {
     // nhiều thuộc tính cho 1 sản phẩm
     onDelete: 'CASCADE', // khi xóa entity cha entity con cũng bị xóa
