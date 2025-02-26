@@ -10,6 +10,7 @@ import { CommonEntity } from '../../../common/entity/common.entity';
 import { Post } from '@nestjs/common';
 import { AuthEntity } from '../../auth/auth.entity';
 import { ProductAttribute } from './product_attribute.entity';
+import { OrderEntity } from 'src/modules/order/entities/order.entity';
 
 @Entity('product')
 export class ProductEntity extends CommonEntity {
@@ -43,8 +44,6 @@ export class ProductEntity extends CommonEntity {
   @Column({ nullable: true })
   image: string;
 
-  @Column({ nullable: false })
-  quantity: number;
 
   @ManyToOne(() => AuthEntity, { onDelete: 'CASCADE' })
   createBy: AuthEntity;
@@ -54,4 +53,7 @@ export class ProductEntity extends CommonEntity {
     // một sản phẩm có nhiều thuộc tính
   })
   attributes: ProductAttribute[];
+
+  // @ManyToOne(() => OrderEntity, (order) => order.product, { onDelete: 'SET NULL' })
+  // order: OrderEntity
 }

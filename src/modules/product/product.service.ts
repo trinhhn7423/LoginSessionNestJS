@@ -24,7 +24,7 @@ export class ProductService {
     private readonly productAttributeValueRepository: Repository<ProductAttributeValue>,
     @InjectRepository(AuthEntity)
     private readonly authRepo: Repository<AuthEntity>,
-  ) {}
+  ) { }
 
   async createProduct(
     session: Record<string, any>,
@@ -49,7 +49,7 @@ export class ProductService {
       compare_price: body.compare_price,
       image: urlImage,
       cost: body.cost,
-      quantity: body.quantity,
+      // quantity: body.quantity,
       createBy: user,
       attributes: attributes,
     });
@@ -67,6 +67,7 @@ export class ProductService {
         // console.log('valueAttr', valueAttr);
         const createAttrValue = this.productAttributeValueRepository.create({
           value: valueAttr.attributeValue,
+          quantity: valueAttr.quantity,
           attribute: createAttribute,
         });
         await this.productAttributeValueRepository.save(createAttrValue);
@@ -162,7 +163,7 @@ export class ProductService {
     product.description = dataUpdate.description;
     product.sell_price = dataUpdate.sell_price;
     product.compare_price = dataUpdate.compare_price;
-    product.quantity = dataUpdate.quantity;
+    // product.quantity = dataUpdate.quantity;
     product.cost = dataUpdate.cost;
     product.updated_at = new Date(Date.now());
     if (dataUpdate.attributes && dataUpdate.attributes.length > 0) {
@@ -180,9 +181,10 @@ export class ProductService {
         for (const valueAttr of attribute.attribute) {
           const createValueAttr = this.productAttributeValueRepository.create({
             value: valueAttr.attributeValue,
+            quantity: valueAttr.quantity,
             attribute: createAttr,
           });
-          console.log('createValueAttr', createValueAttr);
+          // console.log('createValueAttr', createValueAttr);
           await this.productAttributeValueRepository.save(createValueAttr);
         }
         product.attributes.push(createAttr);

@@ -27,12 +27,13 @@ import { Update_productDto } from './dto/update_product.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('products')
-@UseGuards(AuthGuard) /////////////////////////////
+// @UseGuards(AuthGuard) /////////////////////////////
+// @SetMetadata('roles', ['MANAGER'])
+
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService) { }
 
   @Post()
-  @SetMetadata('roles', ['MANAGER'])
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @UploadedFile(
@@ -49,8 +50,6 @@ export class ProductController {
     return this.productService.createProduct(session, file, body);
   }
 
-  // @SetMetadata('roles', ['MANAGER'])
-  // @UseGuards(AuthGuard)
   @Get()
   async getAllProduct(
     @Query('search') search: string,
@@ -61,7 +60,6 @@ export class ProductController {
   }
 
   @Put(':id')
-  @SetMetadata('roles', ['MANAGER'])
   @UseInterceptors(FileInterceptor('file'))
   async editProduct(
     @UploadedFile(
@@ -79,7 +77,6 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @SetMetadata('roles', ['MANAGER'])
   deleteProduct(@Param('id', new ParseIntPipe()) id: number) {
     return this.productService.deleteProduct(id);
   }

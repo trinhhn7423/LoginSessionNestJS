@@ -53,12 +53,6 @@ export class Update_productDto {
   @IsOptional()
   cost: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  @IsOptional()
-  quantity: number;
-
   @IsArray()
   @IsNotEmpty()
   @ValidateNested({ each: true })

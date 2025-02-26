@@ -48,10 +48,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   cost: string;
 
-  @Type(() => Number)
-  @IsNumber()
-  @IsNotEmpty()
-  quantity: number;
+  // @Type(() => Number)
+  // @IsNumber()
+  // @IsNotEmpty()
+  // quantity: number;
 
   @IsArray()
   @IsNotEmpty()
