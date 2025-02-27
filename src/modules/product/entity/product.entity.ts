@@ -18,7 +18,7 @@ export class ProductEntity extends CommonEntity {
   name: string;
 
   @Column({ nullable: false })
-  sku_code: string;
+  sku_code: string; // mã được sử dụng để nhận dạng và theo dõi từng sản phẩm riêng biệt trong kho hàng
 
   @Column({ nullable: false })
   barcode: string;
@@ -39,11 +39,13 @@ export class ProductEntity extends CommonEntity {
   compare_price: number;
 
   @Column({ nullable: false })
-  cost: string;
+  cost: number;
 
   @Column({ nullable: true })
   image: string;
 
+  @Column({ nullable: false })
+  quantity: number;
 
   @ManyToOne(() => AuthEntity, { onDelete: 'CASCADE' })
   createBy: AuthEntity;

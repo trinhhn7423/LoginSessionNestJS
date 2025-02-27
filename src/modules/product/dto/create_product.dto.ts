@@ -44,14 +44,15 @@ export class CreateProductDto {
   @IsNotEmpty()
   compare_price: number;
 
-  @IsString()
+  @Type(() => Number)
+  @IsNumber()
   @IsNotEmpty()
-  cost: string;
+  cost: number;
 
-  // @Type(() => Number)
-  // @IsNumber()
-  // @IsNotEmpty()
-  // quantity: number;
+  @Type(() => Number)
+  @IsNumber()
+  @IsNotEmpty()
+  quantity: number;
 
   @IsArray()
   @IsNotEmpty()

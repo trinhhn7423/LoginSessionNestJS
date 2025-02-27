@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entity/product.entity';
 import { Like, Repository } from 'typeorm';
@@ -7,8 +7,9 @@ import { CloudinaryService } from '../cloudinary/ cloudinary.service';
 import { AuthEntity } from '../auth/auth.entity';
 import { ProductAttributeValue } from './entity/product_attribute_value.entity';
 import { ProductAttribute } from './entity/product_attribute.entity';
-import { Product_attributeDto } from './dto/product_attribute.dto';
 import { Update_productDto } from './dto/update_product.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductService {
@@ -24,7 +25,37 @@ export class ProductService {
     private readonly productAttributeValueRepository: Repository<ProductAttributeValue>,
     @InjectRepository(AuthEntity)
     private readonly authRepo: Repository<AuthEntity>,
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
+
+  async getAllProduct(search: string, page: number = 1, limit: number = 10) {
+    // console.log('search', search);
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+    const cacheKey = 'products';
+    let products: any = await this.cacheManager.get(cacheKey);
+    if (products) console.log('get data cache');
+    if (!products) {
+      console.log('call api products');
+      products = await this.productRepository.find({
+        where: [
+          { name: search ? Like(`%${search}%`) : undefined, isDelete: false },
+          {
+            barcode: search ? Like(`%${search}%`) : undefined,
+            isDelete: false,
+          },
+          { isDelete: false },
+        ],
+        relations: ['attributes', 'attributes.values'],
+        take: page,
+        skip: (page - 1) * limit,
+      });
+
+      await this.cacheManager.set(cacheKey, products, 30000);
+    }
+
+    return products;
+  }
 
   async createProduct(
     session: Record<string, any>,
@@ -49,7 +80,7 @@ export class ProductService {
       compare_price: body.compare_price,
       image: urlImage,
       cost: body.cost,
-      // quantity: body.quantity,
+      quantity: body.quantity,
       createBy: user,
       attributes: attributes,
     });
@@ -67,7 +98,7 @@ export class ProductService {
         // console.log('valueAttr', valueAttr);
         const createAttrValue = this.productAttributeValueRepository.create({
           value: valueAttr.attributeValue,
-          quantity: valueAttr.quantity,
+          // quantity: valueAttr.quantity,
           attribute: createAttribute,
         });
         await this.productAttributeValueRepository.save(createAttrValue);
@@ -78,44 +109,6 @@ export class ProductService {
 
     savedProduct.attributes = attributes;
     return this.productRepository.save(savedProduct);
-  }
-
-  getAllProduct(search: string, page: number = 1, limit: number = 10) {
-    // console.log('search', search);
-    page = Number(page) || 1;
-    limit = Number(limit) || 10;
-
-    // console.log(page, limit);
-
-    const products = this.productRepository.find({
-      where: [
-        { name: search ? Like(`%${search}%`) : undefined, isDelete: false },
-        { barcode: search ? Like(`%${search}%`) : undefined, isDelete: false },
-        { isDelete: false },
-      ],
-      relations: ['attributes', 'attributes.values'],
-      take: page,
-      skip: (page - 1) * limit,
-      // select: {
-      //   id: true,
-      //   name: true,
-      //   sku_code: true,
-      //   barcode: true,
-      //   unit: true,
-      //   sell_price: true,
-      //   compare_price: true,
-      //   description: true,
-      //   quantity: true,
-      //   image: true,
-      //   created_at: true,
-      //   attributes: {
-      //     id: true,
-      //     name: true,
-      //   },
-      // },
-    });
-
-    return products;
   }
 
   async editProduct(
@@ -163,31 +156,34 @@ export class ProductService {
     product.description = dataUpdate.description;
     product.sell_price = dataUpdate.sell_price;
     product.compare_price = dataUpdate.compare_price;
-    // product.quantity = dataUpdate.quantity;
+    product.quantity = dataUpdate.quantity;
     product.cost = dataUpdate.cost;
     product.updated_at = new Date(Date.now());
     if (dataUpdate.attributes && dataUpdate.attributes.length > 0) {
-      // xóa thuộc tính cũ
-      const deleteAttribute = await this.productAttributeRepository.delete({
+      console.log('createValueAttr', dataUpdate.attributes);
+
+      const deleteAttr = await this.productAttributeRepository.delete({
         product: product,
       });
+      product.attributes = [];
+      console.log('deleteAttr', deleteAttr);
+
       for (const attribute of dataUpdate.attributes) {
         const createAttr = this.productAttributeRepository.create({
           name: attribute.name,
           product: product,
         });
-
         await this.productAttributeRepository.save(createAttr);
+
         for (const valueAttr of attribute.attribute) {
           const createValueAttr = this.productAttributeValueRepository.create({
             value: valueAttr.attributeValue,
-            quantity: valueAttr.quantity,
+            // quantity: valueAttr.quantity,
             attribute: createAttr,
           });
-          // console.log('createValueAttr', createValueAttr);
           await this.productAttributeValueRepository.save(createValueAttr);
         }
-        product.attributes.push(createAttr);
+        if (createAttr) product.attributes.push(createAttr);
       }
     }
     const saveProduct = await this.productRepository.save(product);

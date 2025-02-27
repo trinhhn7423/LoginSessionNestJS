@@ -53,4 +53,7 @@ export class AuthEntity extends CommonEntity {
     },
   )
   status: number;
+
+  @Column({ default: false })
+  something: boolean;
 }

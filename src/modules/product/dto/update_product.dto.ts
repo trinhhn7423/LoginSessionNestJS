@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { Product_attributeDto } from './product_attribute.dto';
 import { Type } from 'class-transformer';
+import { Column } from 'typeorm';
 
 export class Update_productDto {
   @IsString()
@@ -48,10 +49,14 @@ export class Update_productDto {
   @IsOptional()
   compare_price: number;
 
-  @IsString()
+  @Type(() => Number)
+  @IsNumber()
   @IsNotEmpty()
   @IsOptional()
-  cost: string;
+  cost: number;
+
+  @Column({ nullable: false })
+  quantity: number;
 
   @IsArray()
   @IsNotEmpty()
