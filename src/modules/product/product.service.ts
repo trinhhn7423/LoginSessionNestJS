@@ -62,8 +62,8 @@ export class ProductService {
     });
 
     if (products.length > 0) {
-      await this.cacheManager.stores[0].set(cacheKey, products, 30_000); // 10 giây 
-      await this.cacheManager.stores[1].set(cacheKey, products, 30_000); // 20 phút
+      await this.cacheManager.stores[0].set(cacheKey, products, 30_000); 
+      await this.cacheManager.stores[1].set(cacheKey, products, 50_000);
     }
 
     return products;
@@ -93,7 +93,7 @@ export class ProductService {
       quantity: body.quantity,
       createBy: user,
     })
-
+    await this.cacheManager.clear();
     return await this.productRepository.save(createProduct);
   }
 
@@ -172,6 +172,7 @@ export class ProductService {
       created_at: new Date(),
     });
 
+    await this.cacheManager.clear();
     return await this.varianRepo.save(createVarian);
 
   }
@@ -228,6 +229,7 @@ export class ProductService {
     findVarian.material = findMaterial;
     findVarian.updated_at = new Date();
 
+    await this.cacheManager.clear();
     return await this.varianRepo.save(findVarian);
   }
 
@@ -287,7 +289,7 @@ export class ProductService {
       findProduct.image = urlImage
 
     await this.productRepository.save(findProduct)
-
+    await this.cacheManager.clear();
     return findProduct
   }
 
