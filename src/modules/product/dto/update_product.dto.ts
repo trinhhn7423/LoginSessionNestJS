@@ -7,7 +7,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Product_attributeDto } from './product_attribute.dto';
 import { Type } from 'class-transformer';
 import { Column } from 'typeorm';
 
@@ -58,11 +57,4 @@ export class Update_productDto {
   @Column({ nullable: false })
   quantity: number;
 
-  @IsArray()
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @IsOptional()
-  @ArrayNotEmpty()
-  @Type(() => Product_attributeDto)
-  attributes: Product_attributeDto[];
 }

@@ -10,12 +10,12 @@ export abstract class CommonEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: null,
+  @Column({
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;

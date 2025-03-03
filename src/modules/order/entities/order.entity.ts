@@ -18,7 +18,7 @@ export enum OrderStatus {
 }
 
 
-@Entity()
+@Entity({ name: 'order' })
 export class OrderEntity extends CommonEntity {
 
     @Column({ nullable: false })

@@ -9,7 +9,7 @@ export enum UserStatus {
   RESIGNED,
 }
 
-@Entity({ name: 'User' })
+@Entity({ name: 'user' })
 export class AuthEntity extends CommonEntity {
   // @ManyToOne(() => AuthEntity, { nullable: true })
   // @JoinColumn({ name: 'manager_id' })

@@ -7,30 +7,27 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeeEntity } from '../employee/employee.entity';
 import { AuthEntity } from '../auth/auth.entity';
 import { ProductEntity } from './entity/product.entity';
-import { ProductAttribute } from './entity/product_attribute.entity';
-import { ProductAttributeValue } from './entity/product_attribute_value.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { ColorEntity } from './entity/color.entity';
+import { ProductVarianEntity } from './entity/product_variant.entity';
+import { SizeEntity } from './entity/size.entity';
+import { MaterialEntity } from './entity/material.entity';
 
 @Module({
-  // imports: [TypeOrmModule.forFeature([EmployeeEntity, AuthEntity])],
   imports: [
     CloudinaryModule,
-    // MulterModule.register({
-    //   storage: {
-
-    //   }
-    // }),
     TypeOrmModule.forFeature([
       ProductEntity,
-      ProductAttribute,
-      ProductAttributeValue,
+      ProductVarianEntity,
+      ColorEntity,
+      SizeEntity,
+      MaterialEntity,
       AuthEntity,
     ]),
   ],
   controllers: [ProductController],
   providers: [
     ProductService,
-    CloudinaryModule,
     // {
     //   provide: 'CLOUDINARY',
     //   useFactory: () => {

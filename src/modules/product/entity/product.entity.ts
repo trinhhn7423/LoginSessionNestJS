@@ -9,8 +9,11 @@ import {
 import { CommonEntity } from '../../../common/entity/common.entity';
 import { Post } from '@nestjs/common';
 import { AuthEntity } from '../../auth/auth.entity';
-import { ProductAttribute } from './product_attribute.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
+import { ColorEntity } from './color.entity';
+import { SizeEntity } from './size.entity';
+import { MaterialEntity } from './material.entity';
+import { ProductVarianEntity } from './product_variant.entity';
 
 @Entity('product')
 export class ProductEntity extends CommonEntity {
@@ -18,25 +21,25 @@ export class ProductEntity extends CommonEntity {
   name: string;
 
   @Column({ nullable: false })
-  sku_code: string; // mã được sử dụng để nhận dạng và theo dõi từng sản phẩm riêng biệt trong kho hàng
+  skuCode: string; // mã được sử dụng để nhận dạng và theo dõi từng sản phẩm riêng biệt trong kho hàng
 
   @Column({ nullable: false })
-  barcode: string;
+  barCode: string;  // mã quét vạch 
 
   @Column({ nullable: false })
-  unit: string;
+  unit: string;  // đơn vị tínhh 
 
   @Column({ nullable: false })
-  branch: string;
+  branch: string;  //nhãn hànghàng
 
   @Column({ nullable: false })
-  description: string;
+  description: string;  // chi tiết 
 
   @Column({ nullable: false })
-  sell_price: number;
+  sellPrice: number;  // giá bán 
 
   @Column({ nullable: false })
-  compare_price: number;
+  comparePrice: number;
 
   @Column({ nullable: false })
   cost: number;
@@ -44,18 +47,26 @@ export class ProductEntity extends CommonEntity {
   @Column({ nullable: true })
   image: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   quantity: number;
 
   @ManyToOne(() => AuthEntity, { onDelete: 'CASCADE' })
   createBy: AuthEntity;
 
-  @OneToMany(() => ProductAttribute, (attribute) => attribute.product, {
-    // trỏ đến thuộc tính product trong ProductAttribute
-    // một sản phẩm có nhiều thuộc tính
-  })
-  attributes: ProductAttribute[];
+  // Một sp có nhiều màumàu
+  @OneToMany(() => ColorEntity, (color) => color.product,)
+  colors: ColorEntity[];
 
-  // @ManyToOne(() => OrderEntity, (order) => order.product, { onDelete: 'SET NULL' })
-  // order: OrderEntity
+  //Một sp có nhiều sizesize
+  @OneToMany(() => SizeEntity, (size) => size.product, { onDelete: 'CASCADE' })
+  sizes: SizeEntity[];
+
+  //Một sp có nhiều chất liệu 
+  @OneToMany(() => MaterialEntity, material => material.product, { onDelete: 'CASCADE' })
+  materials: MaterialEntity[];
+
+  //Một sản phẩm có nhiều biến thể 
+  @OneToMany(() => ProductVarianEntity, vatrian => vatrian.product)
+  variants: ProductVarianEntity[];
+
 }

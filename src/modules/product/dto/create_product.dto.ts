@@ -3,10 +3,10 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Product_attributeDto } from './product_attribute.dto';
 import { Type } from 'class-transformer';
 
 export class CreateProductDto {
@@ -16,11 +16,11 @@ export class CreateProductDto {
 
   @IsString()
   @IsNotEmpty()
-  sku_code: string;
+  skuCode: string;
 
   @IsString()
   @IsNotEmpty()
-  barcode: string;
+  barCode: string;
 
   @IsString()
   @IsNotEmpty()
@@ -37,12 +37,12 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
-  sell_price: number;
+  sellPrice: number;
 
   @Type(() => Number)
   @IsNumber()
   @IsNotEmpty()
-  compare_price: number;
+  comparePrice: number;
 
   @Type(() => Number)
   @IsNumber()
@@ -54,10 +54,4 @@ export class CreateProductDto {
   @IsNotEmpty()
   quantity: number;
 
-  @IsArray()
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @ArrayNotEmpty()
-  @Type(() => Product_attributeDto)
-  attributes: Product_attributeDto[];
 }

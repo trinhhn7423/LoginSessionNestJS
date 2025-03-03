@@ -10,26 +10,21 @@ import { createClient } from 'redis';
 import { RedisStore } from 'connect-redis';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-
-      // whitelist: true,
-      // forbidNonWhitelisted: true,
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
-    origin: 'http://localhost:5173',
+    // origin: '*',
     credentials: true,
   });
   app.use(cookieParser());
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads',
-  });
+
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -37,7 +32,7 @@ async function bootstrap() {
   });
   const redisClient = createClient({
     socket: {
-      host: '127.0.0.1', // Đổi thành IP của Redis nếu chạy trên server
+      host: '127.0.0.1', 
       port: 6379,
     },
   });
@@ -62,7 +57,7 @@ async function bootstrap() {
   );
 
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(process.env.PORT ?? 7423);
+  await app.listen(7423);
 }
 
 bootstrap();
