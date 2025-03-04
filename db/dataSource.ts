@@ -1,6 +1,7 @@
 import { AuthEntity } from 'src/modules/auth/auth.entity';
-import { CustomerEntity } from 'src/modules/order/entities/customer.entity';
 import { OrderEntity } from 'src/modules/order/entities/order.entity';
+import { OrderItemEntity } from 'src/modules/order/entities/order_item.entity';
+import { PaymentMethodEntity } from 'src/modules/order/entities/payment_method.entity';
 import { ColorEntity } from 'src/modules/product/entity/color.entity';
 import { MaterialEntity } from 'src/modules/product/entity/material.entity';
 import { ProductEntity } from 'src/modules/product/entity/product.entity';
@@ -28,7 +29,8 @@ export const dataSourceOptions: DataSourceOptions = {
     MaterialEntity,
     SizeEntity,
     OrderEntity,
-    CustomerEntity,
+    PaymentMethodEntity,
+    OrderItemEntity
   ],
   migrations: ['dist/db/migrations/*.js'],
   synchronize: false,

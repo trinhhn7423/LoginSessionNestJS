@@ -15,6 +15,8 @@ import { MaterialEntity } from './entity/material.entity';
 import { CreateVarianDto } from './dto/create_varian.dto';
 import { CreateAttributeDto } from './dto/create_attribute.dto';
 import { UpdateVarianDto } from './dto/update_varian.dto';
+import { UserInfo } from 'os';
+import { userSessionType } from '../auth/auth.service';
 
 @Injectable()
 export class ProductService {
@@ -62,21 +64,22 @@ export class ProductService {
     });
 
     if (products.length > 0) {
-      await this.cacheManager.stores[0].set(cacheKey, products, 30_000); 
+      await this.cacheManager.stores[0].set(cacheKey, products, 30_000);
       await this.cacheManager.stores[1].set(cacheKey, products, 50_000);
     }
 
     return products;
   }
   async createProduct(
-    session: Record<string, any>,
+    session: Record<string, userSessionType>,
     file: Express.Multer.File,
     body: CreateProductDto,
   ) {
     const urlImage = await this.cloudinaryService.uploadFile(file);  // upload ảnh
+    console.log('session:', session);
 
     const user = await this.authRepo.findOneBy({
-      id: session.userData.id || 1,
+      id: session.userData.id,
     });
 
     const createProduct = this.productRepository.create({
@@ -109,10 +112,6 @@ export class ProductService {
     let findColor = await this.colorRepo.findOne({ where: { name: body.color, product: { id: findProduct.id } } })
     let findSize = await this.sizeRepo.findOne({ where: { name: body.size, product: { id: findProduct.id } } })
     let finMaterial = await this.materialRepo.findOne({ where: { name: body.material, product: { id: findProduct.id } } })
-    // console.log("-------------------------");
-    // console.log('findColor', findColor)
-    // console.log('findSize', findSize)
-    // console.log('finMaterial', finMaterial)
 
 
     if (findColor && finMaterial && findSize) {
@@ -256,7 +255,20 @@ export class ProductService {
     return { message: 'Create attribute success' };
   }
 
+  async searchProductVarian(search: string) {
+    const result = await this.varianRepo.find({
+      where: [
 
+        { product: { name: Like(`%${search}%`) } },
+        { skuCode: Like(`%${search}%`) },
+        { color: { name: Like(`%${search}%`) } },
+        { size: { name: Like(`%${search}%`) } },
+        { material: { name: Like(`%${search}%`) } }
+      ],
+      relations: { product: true, color: true, size: true, material: true }
+    })
+    return result;
+  }
   async getAllVarian(idProduct: number) {
     const findVarian = await this.varianRepo.find({
       where: { product: { id: idProduct } },

@@ -35,7 +35,6 @@ export class AuthController {
     @Session() session: Record<string, any>,
     // @Res() res: Response,
   ) {
-    // res.cookie('trinh', 'teststetset');
     return await this.authService.login(
       { email: body.email, password: body.password, phone: body.phone },
       session,

@@ -27,17 +27,19 @@ import { Update_productDto } from './dto/update_product.dto';
 import { CreateVarianDto } from './dto/create_varian.dto';
 import { CreateAttributeDto } from './dto/create_attribute.dto';
 import { UpdateVarianDto } from './dto/update_varian.dto';
+import { userSessionType } from '../auth/auth.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller('products')
-// @UseGuards(AuthGuard) /////////////////////////////
+// @UseGuards(AuthGuard)
 // @SetMetadata('roles', ['MANAGER'])
-
+@Controller('products')
+// @SetMetadata('roles', ['MANAGER'])
 export class ProductController {
   constructor(private productService: ProductService) { }
 
   // tạo mới sản phẩm 
   @Post()
+  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @UploadedFile(
@@ -49,13 +51,14 @@ export class ProductController {
     )
     file: Express.Multer.File,
     @Body() body: CreateProductDto,
-    @Session() session: Record<string, any>,
+    @Session() session: Record<string, userSessionType>,
   ) {
     return this.productService.createProduct(session, file, body);
   }
 
 
   // tạo phiên bản sản phẩm
+
   @Post('varian')
   @UseInterceptors(FileInterceptor('file'))
   createProductVarian(
@@ -68,6 +71,7 @@ export class ProductController {
     )
     file: Express.Multer.File,
     @Body() body: CreateVarianDto
+
   ) {
     return this.productService.createProductVarian(body, file);
   }
@@ -93,8 +97,14 @@ export class ProductController {
 
   // lấy danh sách phiên bản 
   @Get('varian/:id')
-  getAllVarian(@Param('id',ParseIntPipe) idProduct: number) {
+  @UseGuards(AuthGuard)
+  getAllVarian(@Param('id', ParseIntPipe) idProduct: number) {
     return this.productService.getAllVarian(idProduct);
+  }
+
+  @Get('varian')
+  searchProductVarian(@Query('search') search: string) {
+    return this.productService.searchProductVarian(search);
   }
 
 

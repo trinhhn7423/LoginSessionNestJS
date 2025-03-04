@@ -8,6 +8,7 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { createClient } from 'redis';
 import { RedisStore } from 'connect-redis';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,38 +21,47 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
     // origin: '*',
-    credentials: true,
+    // credentials: true,
   });
   app.use(cookieParser());
 
+
+  const config = new DocumentBuilder()
+    .setTitle('My app')
+    .setDescription('API description')
+    .setVersion('1.0')
+    
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 
 
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-  const redisClient = createClient({
-    socket: {
-      host: '127.0.0.1', 
-      port: 6379,
-    },
-  });
+  // const redisClient = createClient({
+  //   socket: {
+  //     host: '127.0.0.1', 
+  //     port: 6379,
+  //   },
+  // });
 
-  redisClient.on('error', (err) => console.error('Redis Client Error', err));
+  // redisClient.on('error', (err) => console.error('Redis Client Error', err));
 
-  await redisClient.connect();
+  // await redisClient.connect();
   app.use(
     session({
-      store: new RedisStore({ client: redisClient, prefix: 'sess:' }),
+      // store: new RedisStore({ client: redisClient, prefix: 'sess:' }),
       name: 'SESSION_TWICE',
       secret: 'secret',
       resave: false, // Không lưu lại session nếu không thay đổi
       saveUninitialized: false, // Không lưu session trống
       cookie: {
         secure: false,
-        httpOnly: true, // Cookie chỉ được gửi qua HTTP
+        httpOnly: false, // Cookie chỉ được gửi qua HTTP
         maxAge: 2000000,
-        // sameSite: 'none',
+        sameSite: 'none',
       },
     }),
   );
