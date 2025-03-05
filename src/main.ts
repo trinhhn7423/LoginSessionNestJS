@@ -25,16 +25,14 @@ async function bootstrap() {
   });
   app.use(cookieParser());
 
-
   const config = new DocumentBuilder()
     .setTitle('My app')
     .setDescription('API description')
     .setVersion('1.0')
-    
+
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -42,7 +40,7 @@ async function bootstrap() {
   });
   // const redisClient = createClient({
   //   socket: {
-  //     host: '127.0.0.1', 
+  //     host: '127.0.0.1',
   //     port: 6379,
   //   },
   // });
@@ -60,7 +58,7 @@ async function bootstrap() {
       cookie: {
         secure: false,
         httpOnly: false, // Cookie chỉ được gửi qua HTTP
-        maxAge: 2000000,
+        maxAge: 20 * 60 * 1000, // Thời gian sống của cookie
         sameSite: 'none',
       },
     }),
