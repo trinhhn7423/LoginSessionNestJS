@@ -25,7 +25,7 @@ import { AuthGuard } from './auth.guard';
 import { EditEmployeeDto } from './dto/editEmployee.dto';
 
 @Controller({ version: '1', path: '/auth' })
-@UseInterceptors(ClassSerializerInterceptor) //tự động biến đổi  dữ liệu trả về từ controller trước khi gửi cho client.
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private authService: AuthService) {}
 
