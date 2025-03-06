@@ -273,7 +273,7 @@ export class ProductService {
     const findVarian = await this.varianRepo.find({
       where: { product: { id: idProduct } },
       relations: ['product', 'color', 'size', 'material'],
-      select: { product: { id: true } }
+      // select: { product: { id: true } }
     })
     return findVarian;
   }
