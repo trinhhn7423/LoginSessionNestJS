@@ -1,4 +1,9 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entity/product.entity';
 import { IsNull, Like, Repository } from 'typeorm';
@@ -35,12 +40,21 @@ export class ProductService {
     @InjectRepository(AuthEntity)
     private readonly authRepo: Repository<AuthEntity>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
-  async getAllProduct(search: string, page: number = 1, limit: number = 10) {
+  ) {}
+
+  async getAllProduct(
+    session: Record<string, any>,
+    search: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
     page = Number(page) || 1;
     limit = Number(limit) || 10;
+    // return session.userData;
+    const finUser = await this.authRepo.findOneBy({ id: session.userData.id });
+    if (!finUser) throw new NotFoundException('User does not exist');
 
-    const cacheKey = `products:${search || 'all'}:page${page}:limit${limit}`;
+    const cacheKey = `products:${search || 'all'}:page${page}:limit${limit}:createBy${finUser.id}`;
 
     let products: any = await this.cacheManager.stores[0].get(cacheKey);
     if (products) {
@@ -57,7 +71,13 @@ export class ProductService {
 
     console.log('Tạo mới dữ liệu từ database...');
     products = await this.productRepository.find({
-      where: search ? { name: Like(`%${search}%`), isDelete: false } : { isDelete: false },
+      where: search
+        ? {
+            name: Like(`%${search}%`),
+            isDelete: false,
+            createBy: { id: finUser.id },
+          }
+        : { isDelete: false, createBy: { id: finUser.id } },
       relations: ['variants.color', 'variants.size', 'variants.material'],
       take: limit,
       skip: (page - 1) * limit,
@@ -70,12 +90,13 @@ export class ProductService {
 
     return products;
   }
+
   async createProduct(
     session: Record<string, userSessionType>,
     file: Express.Multer.File,
     body: CreateProductDto,
   ) {
-    const urlImage = await this.cloudinaryService.uploadFile(file);  // upload ảnh
+    const urlImage = await this.cloudinaryService.uploadFile(file); // upload ảnh
     console.log('session:', session);
 
     const user = await this.authRepo.findOneBy({
@@ -95,24 +116,29 @@ export class ProductService {
       image: urlImage,
       quantity: body.quantity,
       createBy: user,
-    })
+    });
     await this.cacheManager.clear();
     return await this.productRepository.save(createProduct);
   }
 
-  async createProductVarian(
-    body: CreateVarianDto,
-    file: Express.Multer.File
-  ) {
-
-    const findProduct = await this.productRepository.findOne({ where: { id: body.idProduct } })
+  async createProductVarian(body: CreateVarianDto, file: Express.Multer.File) {
+    const findProduct = await this.productRepository.findOne({
+      where: { id: body.idProduct },
+    });
     if (!findProduct) throw new NotFoundException('Product not found ');
 
-
-    let findColor = await this.colorRepo.findOne({ where: { name: body.color, product: { id: findProduct.id } } })
-    let findSize = await this.sizeRepo.findOne({ where: { name: body.size, product: { id: findProduct.id } } })
-    let finMaterial = await this.materialRepo.findOne({ where: { name: body.material, product: { id: findProduct.id } } })
-
+    let findColor = await this.colorRepo.findOne({
+      where: { name: body.color, product: { id: findProduct.id } },
+    });
+    let findSize = await this.sizeRepo.findOne({
+      where: { name: body.size, product: { id: findProduct.id } },
+    });
+    let finMaterial = await this.materialRepo.findOne({
+      where: {
+        name: body.material,
+        product: { id: findProduct.id },
+      },
+    });
 
     if (findColor && finMaterial && findSize) {
       const checkVarian = await this.varianRepo.findOne({
@@ -124,8 +150,8 @@ export class ProductService {
             product: { id: findProduct?.id },
           },
         ],
-        relations: { color: true, size: true, material: true }
-      })
+        relations: { color: true, size: true, material: true },
+      });
       if (checkVarian) throw new NotFoundException('Varian aready exisis');
     }
 
@@ -154,7 +180,6 @@ export class ProductService {
 
     const urlImage = await this.cloudinaryService.uploadFile(file);
 
-
     const createVarian = this.varianRepo.create({
       skuCode: body.skuCode,
       barCode: body.barCode,
@@ -173,19 +198,36 @@ export class ProductService {
 
     await this.cacheManager.clear();
     return await this.varianRepo.save(createVarian);
-
   }
 
-  async updateProductVarian(idVarian: number, body: UpdateVarianDto, file: Express.Multer.File) {
-    const findVarian = await this.varianRepo.findOne({ where: { id: idVarian }, relations: { product: true } });
+  async updateProductVarian(
+    idVarian: number,
+    body: UpdateVarianDto,
+    file: Express.Multer.File,
+  ) {
+    const findVarian = await this.varianRepo.findOne({
+      where: { id: idVarian },
+      relations: { product: true },
+    });
     if (!findVarian) throw new NotFoundException('Varian not found');
 
     // console.log('findVarian.product.id',findVarian.product.id);
     // return findVarian
-    let findColor = await this.colorRepo.findOne({ where: { name: body.color, product: { id: findVarian.product.id } } });
-    let findSize = await this.sizeRepo.findOne({ where: { name: body.size, product: { id: findVarian.product.id } } });
-    let findMaterial = await this.materialRepo.findOne({ where: { name: body.material, product: { id: findVarian.product.id } } });
-
+    let findColor = await this.colorRepo.findOne({
+      where: {
+        name: body.color,
+        product: { id: findVarian.product.id },
+      },
+    });
+    let findSize = await this.sizeRepo.findOne({
+      where: { name: body.size, product: { id: findVarian.product.id } },
+    });
+    let findMaterial = await this.materialRepo.findOne({
+      where: {
+        name: body.material,
+        product: { id: findVarian.product.id },
+      },
+    });
 
     const checkVarian = await this.varianRepo.findOne({
       where: [
@@ -201,15 +243,26 @@ export class ProductService {
       throw new NotFoundException('Variant already exists');
     }
 
-
     if (!findColor) {
-      findColor = await this.colorRepo.save(this.colorRepo.create({ name: body.color, product: findVarian.product }));
+      findColor = await this.colorRepo.save(
+        this.colorRepo.create({
+          name: body.color,
+          product: findVarian.product,
+        }),
+      );
     }
     if (!findSize) {
-      findSize = await this.sizeRepo.save(this.sizeRepo.create({ name: body.size, product: findVarian.product }));
+      findSize = await this.sizeRepo.save(
+        this.sizeRepo.create({ name: body.size, product: findVarian.product }),
+      );
     }
     if (!findMaterial && body.material) {
-      findMaterial = await this.materialRepo.save(this.materialRepo.create({ name: body.material, product: findVarian.product }));
+      findMaterial = await this.materialRepo.save(
+        this.materialRepo.create({
+          name: body.material,
+          product: findVarian.product,
+        }),
+      );
     }
     if (file) {
       findVarian.image = await this.cloudinaryService.uploadFile(file);
@@ -217,12 +270,12 @@ export class ProductService {
 
     // Cập nhật thông tin variant
     findVarian.skuCode = body.skuCode;
-    findVarian.barCode = body.barCode
-    findVarian.unit = body.unit
-    findVarian.sellPrice = body.sellPrice
-    findVarian.comparePrice = body.comparePrice
-    findVarian.cost = body.cost
-    findVarian.quantity = body.quantity
+    findVarian.barCode = body.barCode;
+    findVarian.unit = body.unit;
+    findVarian.sellPrice = body.sellPrice;
+    findVarian.comparePrice = body.comparePrice;
+    findVarian.cost = body.cost;
+    findVarian.quantity = body.quantity;
     findVarian.color = findColor;
     findVarian.size = findSize;
     findVarian.material = findMaterial;
@@ -232,23 +285,32 @@ export class ProductService {
     return await this.varianRepo.save(findVarian);
   }
 
-
   async createAttribute(body: CreateAttributeDto) {
-
-    const findProduct = await this.productRepository.findOne({ where: { id: body.idProduct } })
+    const findProduct = await this.productRepository.findOne({
+      where: { id: body.idProduct },
+    });
     if (!findProduct) throw new NotFoundException('Product not found ');
     for (const color of body.arrColors) {
       // console.log(color);
-      const createColor = this.colorRepo.create({ name: color, product: findProduct })
+      const createColor = this.colorRepo.create({
+        name: color,
+        product: findProduct,
+      });
       await this.colorRepo.save(createColor);
     }
     for (const size of body.arrSizes) {
-      const createSize = this.sizeRepo.create({ name: size, product: findProduct })
+      const createSize = this.sizeRepo.create({
+        name: size,
+        product: findProduct,
+      });
       await this.sizeRepo.save(createSize);
     }
     if (body.arrMaterials) {
       for (const material of body.arrMaterials) {
-        const createMaterial = this.materialRepo.create({ name: material, product: findProduct })
+        const createMaterial = this.materialRepo.create({
+          name: material,
+          product: findProduct,
+        });
         await this.materialRepo.save(createMaterial);
       }
     }
@@ -258,51 +320,51 @@ export class ProductService {
   async searchProductVarian(search: string) {
     const result = await this.varianRepo.find({
       where: [
-
         { product: { name: Like(`%${search}%`) } },
         { skuCode: Like(`%${search}%`) },
         { color: { name: Like(`%${search}%`) } },
         { size: { name: Like(`%${search}%`) } },
-        { material: { name: Like(`%${search}%`) } }
+        { material: { name: Like(`%${search}%`) } },
       ],
-      relations: { product: true, color: true, size: true, material: true }
-    })
+      relations: { product: true, color: true, size: true, material: true },
+    });
     return result;
   }
+
   async getAllVarian(idProduct: number) {
     const findVarian = await this.varianRepo.find({
       where: { product: { id: idProduct } },
       relations: ['product', 'color', 'size', 'material'],
       // select: { product: { id: true } }
-    })
+    });
     return findVarian;
   }
-
 
   async editProduct(
     id: number,
     dataUpdate: Update_productDto,
     file: Express.Multer.File,
   ) {
-    const findProduct = await this.productRepository.findOne({ where: { id: id } })
-    if (!findProduct) throw new NotFoundException('Product Not found')
-    const urlImage = await this.cloudinaryService.uploadFile(file);  // upload ảnh
+    const findProduct = await this.productRepository.findOne({
+      where: { id: id },
+    });
+    if (!findProduct) throw new NotFoundException('Product Not found');
+    const urlImage = await this.cloudinaryService.uploadFile(file); // upload ảnh
 
-    findProduct.name = dataUpdate.name,
-      findProduct.skuCode = dataUpdate.sku_code,
-      findProduct.barCode = dataUpdate.barcode,
-      findProduct.unit = dataUpdate.unit,
+    (findProduct.name = dataUpdate.name),
+      (findProduct.skuCode = dataUpdate.sku_code),
+      (findProduct.barCode = dataUpdate.barcode),
+      (findProduct.unit = dataUpdate.unit),
+      (findProduct.description = dataUpdate.description),
+      (findProduct.sellPrice = dataUpdate.sell_price),
+      (findProduct.comparePrice = dataUpdate.compare_price),
+      (findProduct.cost = dataUpdate.cost),
+      (findProduct.quantity = dataUpdate.quantity),
+      (findProduct.image = urlImage);
 
-      findProduct.description = dataUpdate.description,
-      findProduct.sellPrice = dataUpdate.sell_price,
-      findProduct.comparePrice = dataUpdate.compare_price,
-      findProduct.cost = dataUpdate.cost,
-      findProduct.quantity = dataUpdate.quantity,
-      findProduct.image = urlImage
-
-    await this.productRepository.save(findProduct)
+    await this.productRepository.save(findProduct);
     await this.cacheManager.clear();
-    return findProduct
+    return findProduct;
   }
 
   async deleteProduct(id: number) {

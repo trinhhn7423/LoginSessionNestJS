@@ -34,7 +34,7 @@ export const dataSourceOptions: DataSourceOptions = {
   ],
   migrations: ['dist/db/migrations/*.js'],
   synchronize: false,
-  logging: true,
+  // logging: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

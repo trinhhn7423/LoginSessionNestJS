@@ -30,16 +30,15 @@ import { UpdateVarianDto } from './dto/update_varian.dto';
 import { userSessionType } from '../auth/auth.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
-// @UseGuards(AuthGuard)
 // @SetMetadata('roles', ['MANAGER'])
+@UseGuards(AuthGuard)
 @Controller('products')
 // @SetMetadata('roles', ['MANAGER'])
 export class ProductController {
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService) {}
 
-  // tạo mới sản phẩm 
+  // tạo mới sản phẩm
   @Post()
-  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async createProduct(
     @UploadedFile(
@@ -56,7 +55,6 @@ export class ProductController {
     return this.productService.createProduct(session, file, body);
   }
 
-
   // tạo phiên bản sản phẩm
 
   @Post('varian')
@@ -70,14 +68,12 @@ export class ProductController {
       }),
     )
     file: Express.Multer.File,
-    @Body() body: CreateVarianDto
-
+    @Body() body: CreateVarianDto,
   ) {
     return this.productService.createProductVarian(body, file);
   }
 
-
-  // sửa phiên bản sản phẩm 
+  // sửa phiên bản sản phẩm
   @Put('varian/:id')
   @UseInterceptors(FileInterceptor('file'))
   updateProductVarian(
@@ -90,14 +86,13 @@ export class ProductController {
     )
     file: Express.Multer.File,
     @Param('id', new ParseIntPipe()) idVarian: number,
-    @Body() body: UpdateVarianDto
+    @Body() body: UpdateVarianDto,
   ) {
     return this.productService.updateProductVarian(idVarian, body, file);
   }
 
-  // lấy danh sách phiên bản 
+  // lấy danh sách phiên bản
   @Get('varian/:id')
-  @UseGuards(AuthGuard)
   getAllVarian(@Param('id', ParseIntPipe) idProduct: number) {
     return this.productService.getAllVarian(idProduct);
   }
@@ -107,15 +102,15 @@ export class ProductController {
     return this.productService.searchProductVarian(search);
   }
 
-
   // lấy danh sách sản phẩmphẩm
   @Get()
   async getAllProduct(
     @Query('search') search: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Session() session: Record<string, any>,
   ) {
-    return this.productService.getAllProduct(search, page, limit);
+    return this.productService.getAllProduct(session, search, page, limit);
   }
 
   // cập nhật sản phẩmphẩm
@@ -141,7 +136,7 @@ export class ProductController {
     return this.productService.deleteProduct(id);
   }
 
-  // tạo thuộc tính màu sắc , kích cỡ , chất liệu 
+  // tạo thuộc tính màu sắc , kích cỡ , chất liệu
   @Post('attribute')
   createAttribute(@Body() body: CreateAttributeDto) {
     return this.productService.createAttribute(body);

@@ -38,19 +38,19 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-  // const redisClient = createClient({
-  //   socket: {
-  //     host: '127.0.0.1',
-  //     port: 6379,
-  //   },
-  // });
+  const redisClient = createClient({
+    socket: {
+      host: '127.0.0.1',
+      port: 6379,
+    },
+  });
 
-  // redisClient.on('error', (err) => console.error('Redis Client Error', err));
+  redisClient.on('error', (err) => console.error('Redis Client Error', err));
 
-  // await redisClient.connect();
+  await redisClient.connect();
   app.use(
     session({
-      // store: new RedisStore({ client: redisClient, prefix: 'sess:' }),
+      store: new RedisStore({ client: redisClient, prefix: 'sess:' }),
       name: 'SESSION_TWICE',
       secret: 'secret',
       resave: false, // Không lưu lại session nếu không thay đổi
@@ -58,7 +58,7 @@ async function bootstrap() {
       cookie: {
         secure: false,
         httpOnly: false, // Cookie chỉ được gửi qua HTTP
-        maxAge: 20 * 60 * 1000, // Thời gian sống của cookie
+        maxAge: 2 * 60 * 1000,
         sameSite: 'none',
       },
     }),
